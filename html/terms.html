@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroCare AI — Terms and Conditions</title>
+    <meta name="description" content="Terms and Conditions of Use for NeuroCare AI.">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-content {
+            padding: 40px 10%;
+            max-width: 900px;
+            margin: 0 auto;
+            flex: 1;
+        }
+
+        .document-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            line-height: 1.7;
+        }
+
+        .document-container h1 {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .document-container .last-updated {
+            font-size: 0.85rem;
+            color: var(--text-soft);
+            margin-bottom: 32px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 24px;
+        }
+
+        .document-container h2 {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 32px 0 16px;
+            color: var(--text);
+        }
+
+        .document-container h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin: 24px 0 12px;
+            color: var(--text);
+        }
+
+        .document-container p {
+            margin-bottom: 16px;
+            color: var(--text-soft);
+            font-size: 0.95rem;
+        }
+
+        .document-container ul {
+            margin-bottom: 16px;
+            padding-left: 24px;
+            color: var(--text-soft);
+            font-size: 0.95rem;
+        }
+
+        .document-container li {
+            margin-bottom: 8px;
+        }
+
+        @media(max-width:768px) {
+            .page-content {
+                padding: 20px;
+            }
+
+            .document-container {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-layout">
+        <aside class="nc-sidebar" id="pageSidebar">
+            <!-- Sidebar populated by JS based on user role or default -->
+        </aside>
+
+        <main class="nc-main-with-sidebar content-area">
+            <div class="nc-topbar">
+                <div>
+                    <h2>Terms and Conditions</h2>
+                    <div class="tb-sub">Legal guidelines for using the platform</div>
+                </div>
+            </div>
+
+            <div class="page-content">
+                <div class="document-container">
+                    <h1>Terms and Conditions</h1>
+                    <div class="last-updated">Last Updated: February 28, 2026</div>
+
+                    <h2>1. Agreement to Terms</h2>
+                    <p>By accessing or using the NeuroCare AI platform, you agree to be bound by these Terms and
+                        Conditions. If you disagree with any part of the terms, you must not access the service.</p>
+
+                    <h2>2. Not Medical Advice</h2>
+                    <p><strong>CRITICAL DISCLAIMER:</strong> NeuroCare AI is designed for educational, organizational,
+                        and preliminary screening purposes. It is <strong>NOT</strong> a substitute for professional
+                        medical advice, diagnosis, or treatment.</p>
+                    <p>Always seek the advice of your pediatrician, developmental psychologist, or other qualified
+                        health provider with any questions you may have regarding a medical condition. Do not disregard
+                        professional medical advice or delay in seeking it because of something you have read or seen on
+                        this platform.</p>
+
+                    <h2>3. Use License</h2>
+                    <p>This is a demonstration environment. Users are granted a temporary, non-exclusive license to use
+                        the interface for evaluative purposes.</p>
+                    <ul>
+                        <li>You may not use the materials for any commercial purpose without prior consent.</li>
+                        <li>You may not attempt to decompile or reverse engineer any software contained on the platform.
+                        </li>
+                        <li>This license shall automatically terminate if you violate any of these restrictions.</li>
+                    </ul>
+
+                    <h2>4. Limitations of Liability</h2>
+                    <p>In no event shall NeuroCare AI or its suppliers be liable for any damages (including, without
+                        limitation, damages for loss of data or profit, or due to business interruption) arising out of
+                        the use or inability to use the materials on the platform, even if NeuroCare AI has been
+                        notified orally or in writing of the possibility of such damage.</p>
+
+                    <h2>5. Governing Law</h2>
+                    <p>Any claim relating to NeuroCare AI's website shall be governed by local laws without regard to
+                        its conflict of law provisions.</p>
+
+                    <h2>6. Contact</h2>
+                    <p>If you have any questions about these Terms, please contact us at terms@neurocare-ai.com.</p>
+                </div>
+            </div>
+
+            <footer class="nc-footer" style="padding:24px 32px; margin-top:auto;">
+                <div class="footer-brand">🧠 NeuroCare AI</div>
+                <div class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="privacy.html">Privacy</a>
+                    <a href="terms.html">Terms</a>
+                    <a href="contact.html">Contact</a>
+                </div>
+                <div class="footer-copy">© 2026 NeuroCare AI. For screening purposes only.</div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script>
+        // Sidebar logic similar to other pages to keep the UI consistent if a user is logged in
+        var user = NeuroCareAuth.getCurrentUser();
+        var sb = document.getElementById('pageSidebar');
+
+        if (user) {
+            var isClinic = user.role === 'clinician';
+            sb.innerHTML = '<div class="sb-logo"><a href="#" onclick="window.location.href=NeuroCareAuth.getLogoUrl();return false;" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;"><div class="sb-logo-mark">🧠</div><div><div class="sb-logo-name">NeuroCare AI</div><div class="sb-logo-sub">' + (isClinic ? 'Clinician Portal' : 'Parent Portal') + '</div></div></a></div>' +
+                '<nav class="sb-nav">' +
+                '<div class="sb-section">Overview</div>' +
+                '<a href="index.html" class="sb-item"><div class="sb-item-icon">🏡</div>Home</a>' +
+                '<a href="' + NeuroCareAuth.getDashboardUrl() + '" class="sb-item"><div class="sb-item-icon">🏠</div>Dashboard</a>' +
+                (isClinic ? '<a href="all-patients.html" class="sb-item"><div class="sb-item-icon">👥</div>All Patients</a><a href="alerts.html" class="sb-item"><div class="sb-item-icon">⚠️</div>Alerts</a>' : '') +
+                '<div class="sb-section">Account</div>' +
+                '<a href="schedule.html" class="sb-item"><div class="sb-item-icon">📅</div>Schedule</a>' +
+                '<a href="reports.html" class="sb-item"><div class="sb-item-icon">📄</div>Reports</a>' +
+                '<a href="settings.html" class="sb-item"><div class="sb-item-icon">⚙️</div>Settings</a>' +
+                '</nav>';
+        } else {
+            // Default sidebar if not logged in
+            sb.innerHTML = '<div class="sb-logo"><a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;"><div class="sb-logo-mark">🧠</div><div><div class="sb-logo-name">NeuroCare AI</div><div class="sb-logo-sub">Early Detection</div></div></a></div>' +
+                '<nav class="sb-nav">' +
+                '<div class="sb-section">Navigation</div>' +
+                '<a href="index.html" class="sb-item"><div class="sb-item-icon">🏡</div>Home</a>' +
+                '<a href="login.html" class="sb-item"><div class="sb-item-icon">🔑</div>Log In</a>' +
+                '</nav>';
+        }
+    </script>
+</body>
+
+</html>

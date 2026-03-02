@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroCare AI — All Patients</title>
+    <meta name="description" content="Full patient registry with search, filter, and risk-level management.">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .content-area {
+            flex: 1;
+        }
+
+        .page-content {
+            padding: 28px 32px 48px;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .toolbar-search {
+            flex: 1;
+            min-width: 220px;
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--surface2);
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 0.88rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .toolbar-search:focus {
+            border-color: var(--accent);
+        }
+
+        .filter-pill {
+            padding: 7px 16px;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-soft);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-pill.active,
+        .filter-pill:hover {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .filter-pill.high.active {
+            color: var(--danger);
+            border-color: var(--danger);
+            background: rgba(248, 113, 113, 0.1);
+        }
+
+        .filter-pill.medium.active {
+            color: var(--warn);
+            border-color: var(--warn);
+            background: rgba(251, 191, 36, 0.1);
+        }
+
+        .filter-pill.low.active {
+            color: var(--accent3);
+            border-color: var(--accent3);
+            background: rgba(52, 211, 153, 0.1);
+        }
+
+        /* Patient Table */
+        .patient-table {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+        }
+
+        .pt-head {
+            display: grid;
+            grid-template-columns: 2.5fr 1fr 1fr 1fr 1fr 120px;
+            padding: 12px 20px;
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-soft);
+        }
+
+        .pt-row {
+            display: grid;
+            grid-template-columns: 2.5fr 1fr 1fr 1fr 1fr 120px;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+            transition: background 0.15s;
+            cursor: pointer;
+        }
+
+        .pt-row:last-child {
+            border-bottom: none;
+        }
+
+        .pt-row:hover {
+            background: rgba(56, 189, 248, 0.04);
+        }
+
+        .pt-cell {
+            font-size: 0.85rem;
+        }
+
+        .patient-name-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .p-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #050d1a;
+            flex-shrink: 0;
+        }
+
+        .p-name {
+            font-weight: 600;
+            font-size: 0.88rem;
+        }
+
+        .p-id {
+            font-size: 0.72rem;
+            color: var(--text-soft);
+        }
+
+        .risk-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .risk-badge::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .risk-high {
+            color: var(--danger);
+            background: rgba(248, 113, 113, 0.1);
+        }
+
+        .risk-medium {
+            color: var(--warn);
+            background: rgba(251, 191, 36, 0.1);
+        }
+
+        .risk-low {
+            color: var(--accent3);
+            background: rgba(52, 211, 153, 0.1);
+        }
+
+        .status-badge {
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .status-review {
+            color: var(--accent);
+        }
+
+        .status-scheduled {
+            color: var(--warn);
+        }
+
+        .status-completed {
+            color: var(--accent3);
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .action-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+        .action-btn:hover {
+            background: rgba(56, 189, 248, 0.1);
+            border-color: var(--accent);
+        }
+
+        /* Summary Bar */
+        .summary-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        @media(max-width:1024px) {
+
+            .pt-head,
+            .pt-row {
+                grid-template-columns: 2fr 1fr 1fr 100px;
+            }
+
+            .pt-head>*:nth-child(3),
+            .pt-head>*:nth-child(4),
+            .pt-row>*:nth-child(3),
+            .pt-row>*:nth-child(4) {
+                display: none;
+            }
+
+            .summary-bar {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media(max-width:768px) {
+            .page-content {
+                padding: 20px;
+            }
+
+            .summary-bar {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-layout">
+        <!-- SIDEBAR (Clinician) -->
+        <aside class="nc-sidebar">
+            <div class="sb-logo">
+                <div class="sb-logo-mark">🧠</div>
+                <div>
+                    <div class="sb-logo-name">NeuroCare AI</div>
+                    <div class="sb-logo-sub">Clinician Portal</div>
+                </div>
+            </div>
+            <nav class="sb-nav">
+                <div class="sb-section">Overview</div>
+                <a href="index.html" class="sb-item">
+                    <div class="sb-item-icon">🏡</div>Home
+                </a>
+                <a href="clinician-dashboard.html" class="sb-item">
+                    <div class="sb-item-icon">🏠</div>Dashboard
+                </a>
+                <a href="all-patients.html" class="sb-item active">
+                    <div class="sb-item-icon">👥</div>All Patients<span class="sb-badge">24</span>
+                </a>
+                <a href="alerts.html" class="sb-item">
+                    <div class="sb-item-icon">⚠️</div>Alerts<span class="sb-badge">7</span>
+                </a>
+                <div class="sb-section">Screening</div>
+                <a href="mchat-screening.html" class="sb-item">
+                    <div class="sb-item-icon">📋</div>M-CHAT Screening
+                </a>
+                <a href="video-analysis.html" class="sb-item">
+                    <div class="sb-item-icon">🎥</div>Video Analysis
+                </a>
+                <a href="explainable-ai.html" class="sb-item">
+                    <div class="sb-item-icon">🔍</div>Explainable AI
+                </a>
+                <div class="sb-section">Analytics</div>
+                <a href="progress-tracking.html" class="sb-item">
+                    <div class="sb-item-icon">📈</div>Progress Tracking
+                </a>
+                <a href="population-stats.html" class="sb-item">
+                    <div class="sb-item-icon">📊</div>Population Stats
+                </a>
+                <a href="clinician-reports.html" class="sb-item">
+                    <div class="sb-item-icon">📄</div>Reports
+                </a>
+                <div class="sb-section">Account</div>
+                <a href="schedule.html" class="sb-item">
+                    <div class="sb-item-icon">📅</div>Schedule
+                </a>
+                <a href="settings.html" class="sb-item">
+                    <div class="sb-item-icon">⚙️</div>Settings
+                </a>
+            </nav>
+            <div class="sb-bottom">
+                <div class="sb-user">
+                    <div class="sb-avatar">DR</div>
+                    <div class="sb-user-info">
+                        <div class="sb-user-name">Dr. Rahul Mehta</div>
+                        <div class="sb-user-role">Developmental Pediatrician</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="nc-main-with-sidebar content-area">
+            <div class="nc-topbar">
+                <div>
+                    <h2>All Patients</h2>
+                    <div class="tb-sub">Manage your patient registry</div>
+                </div>
+                <div class="tb-actions">
+                    <button class="btn-primary btn-sm" onclick="window.location.href='add-patient.html'">+ Add
+                        Patient</button>
+                </div>
+            </div>
+
+            <div class="page-content">
+                <!-- Summary -->
+                <div class="summary-bar">
+                    <div class="nc-stat-card">
+                        <div class="stat-value" style="color:var(--text)">24</div>
+                        <div class="stat-label">Total Patients</div>
+                        <div class="stat-trend trend-up">↑ +3 this month</div>
+                    </div>
+                    <div class="nc-stat-card">
+                        <div class="stat-value" style="color:var(--danger)">7</div>
+                        <div class="stat-label">High Risk</div>
+                        <div class="stat-trend trend-down">↑ +2 this week</div>
+                    </div>
+                    <div class="nc-stat-card">
+                        <div class="stat-value" style="color:var(--warn)">11</div>
+                        <div class="stat-label">Medium Risk</div>
+                        <div class="stat-trend trend-flat">— stable</div>
+                    </div>
+                    <div class="nc-stat-card">
+                        <div class="stat-value" style="color:var(--accent3)">6</div>
+                        <div class="stat-label">Low Risk / Clear</div>
+                        <div class="stat-trend trend-up">↑ +1 cleared</div>
+                    </div>
+                </div>
+
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <input class="toolbar-search" type="text"
+                        placeholder="🔍 Search patients by name, ID, or risk level...">
+                    <button class="filter-pill active" onclick="filterPill(this)">All</button>
+                    <button class="filter-pill high" onclick="filterPill(this)">High Risk</button>
+                    <button class="filter-pill medium" onclick="filterPill(this)">Medium</button>
+                    <button class="filter-pill low" onclick="filterPill(this)">Low</button>
+                </div>
+
+                <!-- Patient Table -->
+                <div class="patient-table">
+                    <div class="pt-head">
+                        <div>Patient</div>
+                        <div>Age</div>
+                        <div>Risk Level</div>
+                        <div>Score</div>
+                        <div>Status</div>
+                        <div>Actions</div>
+                    </div>
+                    <div class="pt-row">
+                        <div class="pt-cell">
+                            <div class="patient-name-row">
+                                <div class="p-avatar">AK</div>
+                                <div>
+                                    <div class="p-name">Aiden K.</div>
+                                    <div class="p-id">NCR-0047</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pt-cell">2.5y M</div>
+                        <div class="pt-cell"><span class="risk-badge risk-high">High</span></div>
+                        <div class="pt-cell">78%</div>
+                        <div class="pt-cell"><span class="status-badge status-review">Review</span></div>
+                        <div class="pt-cell">
+                            <div class="action-btns"><button class="action-btn" title="View">👁️</button><button
+                                    class="action-btn" title="Report">📄</button><button class="action-btn"
+                                    title="Screen">🔬</button></div>
+                        </div>
+                    </div>
+                    <div class="pt-row">
+                        <div class="pt-cell">
+                            <div class="patient-name-row">
+                                <div class="p-avatar" style="background:rgba(129,140,248,0.3)">PM</div>
+                                <div>
+                                    <div class="p-name">Priya M.</div>
+                                    <div class="p-id">NCR-0042</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pt-cell">3.0y F</div>
+                        <div class="pt-cell"><span class="risk-badge risk-medium">Medium</span></div>
+                        <div class="pt-cell">52%</div>
+                        <div class="pt-cell"><span class="status-badge status-scheduled">Scheduled</span></div>
+                        <div class="pt-cell">
+                            <div class="action-btns"><button class="action-btn" title="View">👁️</button><button
+                                    class="action-btn" title="Report">📄</button><button class="action-btn"
+                                    title="Screen">🔬</button></div>
+                        </div>
+                    </div>
+                    <div class="pt-row">
+                        <div class="pt-cell">
+                            <div class="patient-name-row">
+                                <div class="p-avatar" style="background:rgba(52,211,153,0.3)">LR</div>
+                                <div>
+                                    <div class="p-name">Leo R.</div>
+                                    <div class="p-id">NCR-0039</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pt-cell">1.8y M</div>
+                        <div class="pt-cell"><span class="risk-badge risk-low">Low</span></div>
+                        <div class="pt-cell">18%</div>
+                        <div class="pt-cell"><span class="status-badge status-completed">Completed</span></div>
+                        <div class="pt-cell">
+                            <div class="action-btns"><button class="action-btn" title="View">👁️</button><button
+                                    class="action-btn" title="Report">📄</button><button class="action-btn"
+                                    title="Screen">🔬</button></div>
+                        </div>
+                    </div>
+                    <div class="pt-row">
+                        <div class="pt-cell">
+                            <div class="patient-name-row">
+                                <div class="p-avatar">ZT</div>
+                                <div>
+                                    <div class="p-name">Zara T.</div>
+                                    <div class="p-id">NCR-0051</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pt-cell">2.2y F</div>
+                        <div class="pt-cell"><span class="risk-badge risk-high">High</span></div>
+                        <div class="pt-cell">81%</div>
+                        <div class="pt-cell"><span class="status-badge status-review">Review</span></div>
+                        <div class="pt-cell">
+                            <div class="action-btns"><button class="action-btn" title="View">👁️</button><button
+                                    class="action-btn" title="Report">📄</button><button class="action-btn"
+                                    title="Screen">🔬</button></div>
+                        </div>
+                    </div>
+                    <div class="pt-row">
+                        <div class="pt-cell">
+                            <div class="patient-name-row">
+                                <div class="p-avatar" style="background:rgba(251,191,36,0.3)">RH</div>
+                                <div>
+                                    <div class="p-name">Rohan H.</div>
+                                    <div class="p-id">NCR-0045</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pt-cell">2.9y M</div>
+                        <div class="pt-cell"><span class="risk-badge risk-medium">Medium</span></div>
+                        <div class="pt-cell">48%</div>
+                        <div class="pt-cell"><span class="status-badge status-scheduled">Scheduled</span></div>
+                        <div class="pt-cell">
+                            <div class="action-btns"><button class="action-btn" title="View">👁️</button><button
+                                    class="action-btn" title="Report">📄</button><button class="action-btn"
+                                    title="Screen">🔬</button></div>
+                        </div>
+                    </div>
+                    <div class="pt-row">
+                        <div class="pt-cell">
+                            <div class="patient-name-row">
+                                <div class="p-avatar" style="background:rgba(248,113,113,0.3)">SK</div>
+                                <div>
+                                    <div class="p-name">Sofia K.</div>
+                                    <div class="p-id">NCR-0048</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pt-cell">1.6y F</div>
+                        <div class="pt-cell"><span class="risk-badge risk-high">High</span></div>
+                        <div class="pt-cell">72%</div>
+                        <div class="pt-cell"><span class="status-badge status-review">Review</span></div>
+                        <div class="pt-cell">
+                            <div class="action-btns"><button class="action-btn" title="View">👁️</button><button
+                                    class="action-btn" title="Report">📄</button><button class="action-btn"
+                                    title="Screen">🔬</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="nc-footer footer-sidebar">
+                <div class="footer-brand">🧠 NeuroCare AI</div>
+                <div class="footer-links"><a href="index.html">Home</a><a href="privacy.html">Privacy</a><a
+                        href="terms.html">Terms</a><a href="contact.html">Contact</a></div>
+                <div class="footer-copy">© 2026 NeuroCare AI. For screening purposes only.</div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script>
+        if (!NeuroCareAuth.isAuthenticated()) {
+            window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+        }
+        function filterPill(btn) {
+            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            var filter = btn.textContent.trim().toLowerCase();
+            document.querySelectorAll('.pt-row').forEach(function (row) {
+                if (filter === 'all') { row.style.display = ''; return; }
+                var badge = row.querySelector('.risk-badge');
+                if (!badge) { row.style.display = 'none'; return; }
+                var risk = badge.textContent.trim().toLowerCase();
+                var match = (filter === 'high risk' && risk === 'high') || (filter === 'medium' && risk === 'medium') || (filter === 'low' && risk === 'low');
+                row.style.display = match ? '' : 'none';
+            });
+        }
+        // Search
+        document.querySelector('.toolbar-search').addEventListener('input', function () {
+            var q = this.value.toLowerCase();
+            document.querySelectorAll('.pt-row').forEach(function (row) {
+                var name = (row.querySelector('.p-name') || {}).textContent || '';
+                var id = (row.querySelector('.p-id') || {}).textContent || '';
+                var risk = (row.querySelector('.risk-badge') || {}).textContent || '';
+                row.style.display = (name.toLowerCase().includes(q) || id.toLowerCase().includes(q) || risk.toLowerCase().includes(q)) ? '' : 'none';
+            });
+        });
+        // Wire action buttons
+        document.querySelectorAll('.action-btn[title="Report"]').forEach(function (btn) {
+            btn.onclick = function () { window.location.href = 'clinician-reports.html'; };
+        });
+        document.querySelectorAll('.action-btn[title="Screen"]').forEach(function (btn) {
+            btn.onclick = function () { window.location.href = 'neurocare-screening.html?from=clinician'; };
+        });
+    </script>
+</body>
+
+</html>

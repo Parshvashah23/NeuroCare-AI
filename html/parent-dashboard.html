@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroCare AI — Parent Dashboard</title>
+    <meta name="description"
+        content="Your NeuroCare AI dashboard — manage child profiles, view screenings, and track progress.">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        /* ── Page Layout ── */
+        .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .content-area {
+            padding: 0;
+            flex: 1;
+        }
+
+        .page-content {
+            padding: 28px 32px 48px;
+        }
+
+        /* ── Welcome Banner ── */
+        .welcome-banner {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(129, 140, 248, 0.08));
+            border: 1px solid rgba(56, 189, 248, 0.15);
+            border-radius: var(--radius-xl);
+            padding: 32px 36px;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -60px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.12), transparent 70%);
+            pointer-events: none;
+        }
+
+        .wb-text h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .wb-text p {
+            color: var(--muted);
+            font-size: 0.92rem;
+            line-height: 1.6;
+            max-width: 500px;
+        }
+
+        .wb-actions {
+            display: flex;
+            gap: 12px;
+            flex-shrink: 0;
+            z-index: 1;
+        }
+
+        /* ── Stat Grid ── */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-icon {
+            margin-bottom: 12px;
+        }
+
+        .stat-icon.blue {
+            background: rgba(56, 189, 248, 0.12);
+        }
+
+        .stat-icon.green {
+            background: rgba(52, 211, 153, 0.12);
+        }
+
+        .stat-icon.purple {
+            background: rgba(129, 140, 248, 0.12);
+        }
+
+        .stat-icon.amber {
+            background: rgba(251, 191, 36, 0.12);
+        }
+
+        /* ── Section ── */
+        .section-title {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* ── Quick Actions ── */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin-bottom: 32px;
+        }
+
+        .qa-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: block;
+        }
+
+        .qa-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 32px rgba(56, 189, 248, 0.1);
+        }
+
+        .qa-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 14px;
+        }
+
+        .qa-card h4 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .qa-card p {
+            color: var(--muted);
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+
+        /* ── Child Profiles ── */
+        .children-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .child-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            transition: all 0.3s;
+        }
+
+        .child-card:hover {
+            border-color: var(--border-bright);
+        }
+
+        .cc-top {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .cc-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .cc-name {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .cc-age {
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .cc-stats {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .cc-stat {
+            flex: 1;
+        }
+
+        .cc-stat-label {
+            font-size: 0.7rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .cc-stat-val {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-top: 2px;
+        }
+
+        .cc-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .cc-btn {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--surface2);
+            color: var(--text);
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+        }
+
+        .cc-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .cc-btn.primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #050d1a;
+            border: none;
+        }
+
+        /* ── Activity Feed ── */
+        .activity-feed {
+            margin-bottom: 32px;
+        }
+
+        .af-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .af-item:last-child {
+            border: none;
+        }
+
+        .af-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .af-icon.blue {
+            background: rgba(56, 189, 248, 0.1);
+        }
+
+        .af-icon.green {
+            background: rgba(52, 211, 153, 0.1);
+        }
+
+        .af-icon.purple {
+            background: rgba(129, 140, 248, 0.1);
+        }
+
+        .af-icon.red {
+            background: rgba(248, 113, 113, 0.1);
+        }
+
+        .af-body {
+            flex: 1;
+        }
+
+        .af-title {
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .af-desc {
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .af-time {
+            font-size: 0.72rem;
+            color: var(--muted);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        /* ── Resources ── */
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
+        }
+
+        .resource-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            transition: all 0.3s;
+        }
+
+        .resource-card:hover {
+            border-color: var(--accent);
+        }
+
+        .rc-tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .resource-card h4 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 0.92rem;
+            margin-bottom: 6px;
+        }
+
+        .resource-card p {
+            color: var(--muted);
+            font-size: 0.82rem;
+            line-height: 1.55;
+        }
+
+        /* ── Bottom Grid ── */
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+        }
+
+        @media(max-width:1100px) {
+            .bottom-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media(max-width:768px) {
+            .page-content {
+                padding: 20px;
+            }
+
+            .welcome-banner {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .wb-actions {
+                justify-content: center;
+            }
+
+            .stat-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .children-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .bottom-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="nc-sidebar">
+            <div class="sb-logo">
+                <div class="sb-logo-mark">🧠</div>
+                <div>
+                    <div class="sb-logo-name">NeuroCare AI</div>
+                    <div class="sb-logo-sub">Parent Portal</div>
+                </div>
+            </div>
+
+            <nav class="sb-nav">
+                <div class="sb-section">Overview</div>
+                <a href="index.html" class="sb-item">
+                    <div class="sb-item-icon">🏡</div>Home
+                </a>
+                <a href="parent-dashboard.html" class="sb-item active">
+                    <div class="sb-item-icon">🏠</div>Dashboard
+                </a>
+                <a href="reports.html" class="sb-item">
+                    <div class="sb-item-icon">📊</div>Reports
+                </a>
+
+                <div class="sb-section">Screening</div>
+                <a href="neurocare-screening.html" class="sb-item">
+                    <div class="sb-item-icon">🔬</div>Full Screening
+                </a>
+                <a href="mchat-screening.html" class="sb-item">
+                    <div class="sb-item-icon">📋</div>M-CHAT Screening
+                </a>
+                <a href="video-analysis.html" class="sb-item">
+                    <div class="sb-item-icon">🎥</div>Video Analysis
+                </a>
+
+                <div class="sb-section">Insights</div>
+                <a href="explainable-ai.html" class="sb-item">
+                    <div class="sb-item-icon">🔍</div>Explainable AI
+                </a>
+                <a href="progress-tracking.html" class="sb-item">
+                    <div class="sb-item-icon">📈</div>Progress Tracking
+                </a>
+
+                <div class="sb-section">Account</div>
+                <a href="schedule.html" class="sb-item">
+                    <div class="sb-item-icon">📅</div>Schedule
+                </a>
+                <a href="settings.html" class="sb-item">
+                    <div class="sb-item-icon">⚙️</div>Settings
+                </a>
+            </nav>
+
+            <div class="sb-bottom">
+                <div class="sb-user">
+                    <div class="sb-avatar">P</div>
+                    <div class="sb-user-info">
+                        <div class="sb-user-name">Parent</div>
+                        <div class="sb-user-role">Parent / Caregiver</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="nc-main-with-sidebar content-area">
+
+            <!-- TOPBAR -->
+            <div class="nc-topbar">
+                <div>
+                    <h2>Dashboard</h2>
+                    <div class="tb-sub" id="dateDisplay">Loading...</div>
+                </div>
+                <div class="tb-actions">
+                    <input class="tb-search" type="text" placeholder="Search...">
+                    <button class="btn-primary btn-sm"
+                        onclick="window.location.href='neurocare-screening.html?from=parent'">+ New
+                        Screening</button>
+                </div>
+            </div>
+
+            <div class="page-content">
+
+                <!-- Welcome Banner -->
+                <div class="welcome-banner">
+                    <div class="wb-text">
+                        <h2 id="welcomeMsg">Welcome back! 👋</h2>
+                        <p>Track your child's developmental screenings, view AI-powered reports, and connect with
+                            healthcare professionals — all in one place.</p>
+                    </div>
+                    <div class="wb-actions">
+                        <a href="neurocare-screening.html" class="btn-primary btn-sm">Start Screening</a>
+                        <a href="reports.html" class="btn-secondary btn-sm">View Reports</a>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="stat-grid">
+                    <div class="nc-stat-card">
+                        <div class="stat-icon blue"
+                            style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">
+                            📋</div>
+                        <div class="stat-value" style="color:var(--accent)">3</div>
+                        <div class="stat-label">Total Screenings</div>
+                        <div class="stat-trend trend-up">↑ +1 this month</div>
+                    </div>
+                    <div class="nc-stat-card">
+                        <div class="stat-icon green"
+                            style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">
+                            📊</div>
+                        <div class="stat-value" style="color:var(--accent3)">Low</div>
+                        <div class="stat-label">Latest Risk Score</div>
+                        <div class="stat-trend trend-up">↓ Improved from Medium</div>
+                    </div>
+                    <div class="nc-stat-card">
+                        <div class="stat-icon purple"
+                            style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">
+                            📅</div>
+                        <div class="stat-value" style="color:var(--accent2)">14</div>
+                        <div class="stat-label">Days Since Last Check</div>
+                        <div class="stat-trend trend-flat">— Schedule next screening</div>
+                    </div>
+                    <div class="nc-stat-card">
+                        <div class="stat-icon amber"
+                            style="width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">
+                            🎯</div>
+                        <div class="stat-value" style="color:var(--warn)">5</div>
+                        <div class="stat-label">Goals In Progress</div>
+                        <div class="stat-trend trend-up">↑ +2 completed</div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="section-title">Quick Actions</div>
+                <div class="quick-actions">
+                    <a href="neurocare-screening.html" class="qa-card">
+                        <div class="qa-icon" style="background:rgba(56,189,248,0.12)">🔬</div>
+                        <h4>Full AI Screening</h4>
+                        <p>Complete questionnaire + video analysis for comprehensive risk assessment.</p>
+                    </a>
+                    <a href="mchat-screening.html" class="qa-card">
+                        <div class="qa-icon" style="background:rgba(129,140,248,0.12)">📋</div>
+                        <h4>M-CHAT Screening</h4>
+                        <p>20-question evidence-based screening for children 16–30 months.</p>
+                    </a>
+                    <a href="video-analysis.html" class="qa-card">
+                        <div class="qa-icon" style="background:rgba(52,211,153,0.12)">🎥</div>
+                        <h4>Upload Video</h4>
+                        <p>Analyze behavioral patterns through AI-powered video analysis.</p>
+                    </a>
+                    <a href="reports.html" class="qa-card">
+                        <div class="qa-icon" style="background:rgba(251,191,36,0.12)">📊</div>
+                        <h4>View Reports</h4>
+                        <p>View detailed analysis reports and download PDF summaries.</p>
+                    </a>
+                </div>
+
+                <div class="bottom-grid">
+                    <div>
+                        <!-- Child Profiles -->
+                        <div class="section-title">
+                            Child Profiles
+                            <button class="btn-ghost" style="font-size:0.82rem;">+ Add Child</button>
+                        </div>
+                        <div class="children-grid">
+                            <div class="child-card">
+                                <div class="cc-top">
+                                    <div class="cc-avatar" style="background:rgba(56,189,248,0.12)">👦</div>
+                                    <div>
+                                        <div class="cc-name">Aiden K.</div>
+                                        <div class="cc-age">2 years, 6 months · Male</div>
+                                    </div>
+                                </div>
+                                <div class="cc-stats">
+                                    <div class="cc-stat">
+                                        <div class="cc-stat-label">Last Screening</div>
+                                        <div class="cc-stat-val">Feb 14</div>
+                                    </div>
+                                    <div class="cc-stat">
+                                        <div class="cc-stat-label">Risk Level</div>
+                                        <div class="cc-stat-val" style="color:var(--danger)">High</div>
+                                    </div>
+                                    <div class="cc-stat">
+                                        <div class="cc-stat-label">Screenings</div>
+                                        <div class="cc-stat-val">3</div>
+                                    </div>
+                                </div>
+                                <div class="cc-actions">
+                                    <a href="neurocare-screening.html" class="cc-btn primary">New Screening</a>
+                                    <a href="progress-tracking.html" class="cc-btn">View Progress</a>
+                                    <a href="reports.html" class="cc-btn">Reports</a>
+                                </div>
+                            </div>
+
+                            <div class="child-card">
+                                <div class="cc-top">
+                                    <div class="cc-avatar" style="background:rgba(129,140,248,0.12)">👧</div>
+                                    <div>
+                                        <div class="cc-name">Priya M.</div>
+                                        <div class="cc-age">3 years, 0 months · Female</div>
+                                    </div>
+                                </div>
+                                <div class="cc-stats">
+                                    <div class="cc-stat">
+                                        <div class="cc-stat-label">Last Screening</div>
+                                        <div class="cc-stat-val">Feb 20</div>
+                                    </div>
+                                    <div class="cc-stat">
+                                        <div class="cc-stat-label">Risk Level</div>
+                                        <div class="cc-stat-val" style="color:var(--warn)">Medium</div>
+                                    </div>
+                                    <div class="cc-stat">
+                                        <div class="cc-stat-label">Screenings</div>
+                                        <div class="cc-stat-val">2</div>
+                                    </div>
+                                </div>
+                                <div class="cc-actions">
+                                    <a href="neurocare-screening.html" class="cc-btn primary">New Screening</a>
+                                    <a href="progress-tracking.html" class="cc-btn">View Progress</a>
+                                    <a href="reports.html" class="cc-btn">Reports</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Schedule -->
+                        <div class="section-title"
+                            style="margin-top:24px; display:flex; justify-content:space-between; align-items:center;">
+                            Upcoming Appointments
+                            <button class="btn-ghost" style="font-size:0.82rem;"
+                                onclick="window.location.href='schedule.html'">View Calendar</button>
+                        </div>
+                        <div class="schedule-card"
+                            style="background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-xl); overflow:hidden; margin-bottom: 24px;">
+                            <div class="sc-body" id="dashboardAppts">
+                                <p
+                                    style="padding: 24px; color: var(--text-soft); font-size: 0.85rem; text-align: center;">
+                                    No upcoming appointments.</p>
+                            </div>
+                        </div>
+
+                        <!-- Resources -->
+                        <div class="section-title">Recommended Resources</div>
+                        <div class="resources-grid">
+                            <div class="resource-card">
+                                <div class="rc-tag">📖 Guide</div>
+                                <h4>Understanding Early Signs</h4>
+                                <p>Learn to recognize common early signs of autism spectrum disorder in toddlers aged
+                                    12–36 months.</p>
+                            </div>
+                            <div class="resource-card">
+                                <div class="rc-tag">🎯 Therapy</div>
+                                <h4>ABA Therapy Overview</h4>
+                                <p>Evidence-based behavioral therapy approaches that can significantly improve outcomes
+                                    when started early.</p>
+                            </div>
+                            <div class="resource-card">
+                                <div class="rc-tag">🤝 Support</div>
+                                <h4>Parent Support Groups</h4>
+                                <p>Connect with other parents navigating similar journeys. Online and local community
+                                    resources available.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Activity Feed -->
+                    <div>
+                        <div class="section-title">Recent Activity</div>
+                        <div class="activity-feed"
+                            style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px;">
+                            <div class="af-item">
+                                <div class="af-icon blue">📋</div>
+                                <div class="af-body">
+                                    <div class="af-title">M-CHAT Screening Completed</div>
+                                    <div class="af-desc">Aiden K. — Score: 7/20 flags raised</div>
+                                </div>
+                                <div class="af-time">2h ago</div>
+                            </div>
+                            <div class="af-item">
+                                <div class="af-icon green">📊</div>
+                                <div class="af-body">
+                                    <div class="af-title">Report Generated</div>
+                                    <div class="af-desc">Full analysis report for Priya M.</div>
+                                </div>
+                                <div class="af-time">1d ago</div>
+                            </div>
+                            <div class="af-item">
+                                <div class="af-icon purple">🎥</div>
+                                <div class="af-body">
+                                    <div class="af-title">Video Analyzed</div>
+                                    <div class="af-desc">30s clip processed for Aiden K.</div>
+                                </div>
+                                <div class="af-time">2d ago</div>
+                            </div>
+                            <div class="af-item">
+                                <div class="af-icon red">⚠️</div>
+                                <div class="af-body">
+                                    <div class="af-title">High Risk Alert</div>
+                                    <div class="af-desc">Aiden — immediate follow-up recommended</div>
+                                </div>
+                                <div class="af-time">3d ago</div>
+                            </div>
+                            <div class="af-item">
+                                <div class="af-icon green">🎯</div>
+                                <div class="af-body">
+                                    <div class="af-title">Goal Completed</div>
+                                    <div class="af-desc">Aiden: "Respond to name" milestone reached</div>
+                                </div>
+                                <div class="af-time">5d ago</div>
+                            </div>
+                            <div class="af-item">
+                                <div class="af-icon blue">🔬</div>
+                                <div class="af-body">
+                                    <div class="af-title">Full Screening Completed</div>
+                                    <div class="af-desc">Priya M. — Medium risk identified</div>
+                                </div>
+                                <div class="af-time">1w ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <footer class="nc-footer footer-sidebar">
+                <div class="footer-brand">🧠 NeuroCare AI</div>
+                <div class="footer-links"><a href="index.html">Home</a><a href="privacy.html">Privacy</a><a
+                        href="terms.html">Terms</a><a href="contact.html">Contact</a></div>
+                <div class="footer-copy">© 2026 NeuroCare AI. For screening purposes only — not a diagnostic tool.</div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script>
+        // Auth guard
+        if (!NeuroCareAuth.isAuthenticated()) {
+            window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+        }
+
+        // Personalize
+        const user = NeuroCareAuth.getCurrentUser();
+        if (user) {
+            const welcomeEl = document.getElementById('welcomeMsg');
+            if (welcomeEl) welcomeEl.textContent = 'Welcome back, ' + (user.name || 'there') + '! 👋';
+        }
+
+        // Date
+        const dateEl = document.getElementById('dateDisplay');
+        if (dateEl) {
+            dateEl.textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        // Render Appointments
+        function renderAppointments() {
+            var appts = JSON.parse(localStorage.getItem('nc_appointments') || '[]');
+            var container = document.getElementById('dashboardAppts');
+            if (!appts || appts.length === 0) return;
+
+            // Render maximum 3 appointments
+            appts = appts.slice(0, 3);
+
+            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            var typeMap = { screening: 'Screening', 'follow-up': 'Follow-up', review: 'Review', video: 'Screening' };
+            var clsMap = { screening: 'screening', 'follow-up': 'follow-up', review: 'review', video: 'screening' };
+
+            var html = appts.map(function (appt) {
+                var d = new Date(appt.date);
+                if (isNaN(d.getTime())) return '';
+                var day = String(d.getDate()).padStart(2, '0');
+                var month = months[d.getMonth()];
+                var tName = typeMap[appt.type] || 'Appointment';
+                var tCls = clsMap[appt.type] || 'screening';
+
+                return '<div style="display:flex;align-items:center;gap:16px;padding:16px 20px;border-bottom:1px solid var(--border);">' +
+                    '<div style="text-align:center;background:var(--surface2);border-radius:8px;padding:6px;min-width:50px;">' +
+                    '<div style="font-size:1.2rem;font-weight:700;color:var(--accent);line-height:1;">' + day + '</div>' +
+                    '<div style="font-size:0.65rem;color:var(--text-soft);text-transform:uppercase;">' + month + '</div></div>' +
+                    '<div style="flex:1;"><div style="font-weight:600;font-size:0.85rem;margin-bottom:2px;">' + appt.patient + ' — ' + tName + '</div>' +
+                    '<div style="font-size:0.75rem;color:var(--text-soft);">' + appt.time + '</div></div>' +
+                    '<span style="padding:3px 8px;border-radius:100px;font-size:0.7rem;font-weight:600;background:rgba(56,189,248,0.1);color:var(--accent);" class="appt-type ' + tCls + '">' + tName + '</span>' +
+                    '</div>';
+            }).join('');
+
+            if (html) container.innerHTML = html;
+        }
+
+        renderAppointments();
+    </script>
+</body>
+
+</html>

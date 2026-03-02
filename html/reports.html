@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroCare AI — Reports & Analysis</title>
+    <meta name="description"
+        content="View detailed AI-powered analysis reports, risk breakdowns, and export PDF summaries.">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .content-area {
+            flex: 1;
+        }
+
+        .page-content {
+            padding: 28px 32px 48px;
+        }
+
+        /* Report List + Detail Layout */
+        .reports-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+        }
+
+        /* Report List */
+        .report-list-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+        }
+
+        .rl-header {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface2);
+        }
+
+        .rl-header h3 {
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+
+        .rl-filter {
+            display: flex;
+            gap: 6px;
+        }
+
+        .rl-filter-btn {
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-soft);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .rl-filter-btn.active,
+        .rl-filter-btn:hover {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .rl-items {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .report-item {
+            padding: 16px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            transition: all 0.15s;
+        }
+
+        .report-item:hover {
+            background: var(--surface2);
+        }
+
+        .report-item.active {
+            background: rgba(56, 189, 248, 0.06);
+            border-left: 3px solid var(--accent);
+        }
+
+        .ri-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .ri-child {
+            font-weight: 600;
+            font-size: 0.88rem;
+        }
+
+        .ri-date {
+            font-size: 0.72rem;
+            color: var(--muted);
+        }
+
+        .ri-type {
+            font-size: 0.78rem;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        /* Report Detail */
+        .report-detail {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+        }
+
+        .rd-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .rd-title h2 {
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+
+        .rd-title p {
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        .rd-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .rd-body {
+            padding: 28px;
+        }
+
+        /* Risk Gauge */
+        .risk-gauge {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            background: var(--surface2);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+
+        .rg-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-heading);
+            position: relative;
+        }
+
+        .rg-circle.high {
+            background: rgba(248, 113, 113, 0.12);
+            border: 3px solid var(--danger);
+        }
+
+        .rg-circle.medium {
+            background: rgba(251, 191, 36, 0.12);
+            border: 3px solid var(--warn);
+        }
+
+        .rg-circle.low {
+            background: rgba(52, 211, 153, 0.12);
+            border: 3px solid var(--accent3);
+        }
+
+        .rg-label {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+        }
+
+        .rg-val {
+            font-size: 1.6rem;
+            font-weight: 800;
+        }
+
+        .rg-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .rg-info p {
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.65;
+        }
+
+        .rg-confidence {
+            margin-top: 14px;
+        }
+
+        .rg-conf-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .rg-conf-bar {
+            height: 6px;
+            background: var(--surface);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+
+        .rg-conf-fill {
+            height: 100%;
+            border-radius: var(--radius-full);
+            background: linear-gradient(90deg, var(--accent3), var(--accent));
+        }
+
+        /* Factor Breakdown */
+        .factors-section {
+            margin-bottom: 28px;
+        }
+
+        .factors-title {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .factors-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .factor-item {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 18px;
+        }
+
+        .fi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .fi-name {
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        .fi-bar {
+            height: 6px;
+            background: var(--surface3);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+
+        .fi-fill {
+            height: 100%;
+            border-radius: var(--radius-full);
+        }
+
+        .fi-fill.red {
+            background: var(--danger);
+        }
+
+        .fi-fill.yellow {
+            background: var(--warn);
+        }
+
+        .fi-fill.green {
+            background: var(--accent3);
+        }
+
+        /* AI Summary */
+        .ai-summary-card {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.06), rgba(129, 140, 248, 0.06));
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .ais-title {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .ais-text {
+            font-size: 0.9rem;
+            line-height: 1.75;
+            color: var(--text);
+        }
+
+        /* Recommendations */
+        .recommendations {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .rec-item {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+        }
+
+        .rec-icon {
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+
+        .rec-item h4 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+
+        .rec-item p {
+            font-size: 0.78rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        /* Links Section */
+        .detail-links {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        @media(max-width:1024px) {
+            .reports-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .factors-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .recommendations {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media(max-width:768px) {
+            .page-content {
+                padding: 20px;
+            }
+
+            .risk-gauge {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="nc-sidebar">
+            <div class="sb-logo">
+                <div class="sb-logo-mark">🧠</div>
+                <div>
+                    <div class="sb-logo-name">NeuroCare AI</div>
+                    <div class="sb-logo-sub">Parent Portal</div>
+                </div>
+            </div>
+            <nav class="sb-nav">
+                <div class="sb-section">Overview</div>
+                <a href="index.html" class="sb-item">
+                    <div class="sb-item-icon">🏡</div>Home
+                </a>
+                <a href="parent-dashboard.html" class="sb-item">
+                    <div class="sb-item-icon">🏠</div>Dashboard
+                </a>
+                <a href="reports.html" class="sb-item active">
+                    <div class="sb-item-icon">📊</div>Reports
+                </a>
+                <div class="sb-section">Screening</div>
+                <a href="neurocare-screening.html" class="sb-item">
+                    <div class="sb-item-icon">🔬</div>Full Screening
+                </a>
+                <a href="mchat-screening.html" class="sb-item">
+                    <div class="sb-item-icon">📋</div>M-CHAT Screening
+                </a>
+                <a href="video-analysis.html" class="sb-item">
+                    <div class="sb-item-icon">🎥</div>Video Analysis
+                </a>
+                <div class="sb-section">Insights</div>
+                <a href="explainable-ai.html" class="sb-item">
+                    <div class="sb-item-icon">🔍</div>Explainable AI
+                </a>
+                <a href="progress-tracking.html" class="sb-item">
+                    <div class="sb-item-icon">📈</div>Progress Tracking
+                </a>
+                <div class="sb-section">Account</div>
+                <a href="settings.html" class="sb-item">
+                    <div class="sb-item-icon">⚙️</div>Settings
+                </a>
+            </nav>
+            <div class="sb-bottom">
+                <div class="sb-user">
+                    <div class="sb-avatar">P</div>
+                    <div class="sb-user-info">
+                        <div class="sb-user-name">Parent</div>
+                        <div class="sb-user-role">Parent / Caregiver</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="nc-main-with-sidebar content-area">
+
+            <div class="nc-topbar">
+                <div>
+                    <h2>Reports & Analysis</h2>
+                    <div class="tb-sub">View detailed AI-powered analysis reports</div>
+                </div>
+                <div class="tb-actions">
+                    <button class="btn-secondary btn-sm">📥 Export All</button>
+                </div>
+            </div>
+
+            <div class="page-content">
+                <div class="reports-layout">
+
+                    <!-- Report List -->
+                    <div class="report-list-panel">
+                        <div class="rl-header">
+                            <h3>All Reports</h3>
+                            <div class="rl-filter">
+                                <button class="rl-filter-btn active" onclick="filterReports('all', this)">All</button>
+                                <button class="rl-filter-btn" onclick="filterReports('aiden', this)">Aiden</button>
+                                <button class="rl-filter-btn" onclick="filterReports('priya', this)">Priya</button>
+                            </div>
+                        </div>
+                        <div class="rl-items">
+                            <div class="report-item active" onclick="selectReport(this)">
+                                <div class="ri-top">
+                                    <div class="ri-child">Aiden K.</div>
+                                    <span class="badge badge-high">High</span>
+                                </div>
+                                <div class="ri-type">Full AI Screening</div>
+                                <div class="ri-date">Feb 14, 2026 · 4:30 PM</div>
+                            </div>
+                            <div class="report-item" onclick="selectReport(this)">
+                                <div class="ri-top">
+                                    <div class="ri-child">Priya M.</div>
+                                    <span class="badge badge-medium">Medium</span>
+                                </div>
+                                <div class="ri-type">Full AI Screening</div>
+                                <div class="ri-date">Feb 20, 2026 · 10:15 AM</div>
+                            </div>
+                            <div class="report-item" onclick="selectReport(this)">
+                                <div class="ri-top">
+                                    <div class="ri-child">Aiden K.</div>
+                                    <span class="badge badge-high">High</span>
+                                </div>
+                                <div class="ri-type">M-CHAT Screening</div>
+                                <div class="ri-date">Feb 10, 2026 · 2:00 PM</div>
+                            </div>
+                            <div class="report-item" onclick="selectReport(this)">
+                                <div class="ri-top">
+                                    <div class="ri-child">Aiden K.</div>
+                                    <span class="badge badge-medium">Medium</span>
+                                </div>
+                                <div class="ri-type">Video Analysis</div>
+                                <div class="ri-date">Feb 8, 2026 · 11:45 AM</div>
+                            </div>
+                            <div class="report-item" onclick="selectReport(this)">
+                                <div class="ri-top">
+                                    <div class="ri-child">Priya M.</div>
+                                    <span class="badge badge-low">Low</span>
+                                </div>
+                                <div class="ri-type">M-CHAT Screening</div>
+                                <div class="ri-date">Jan 28, 2026 · 9:30 AM</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Report Detail -->
+                    <div class="report-detail">
+                        <div class="rd-header">
+                            <div class="rd-title">
+                                <h2>Aiden K. — Full AI Screening</h2>
+                                <p>Feb 14, 2026 · Combined questionnaire + video analysis</p>
+                            </div>
+                            <div class="rd-actions">
+                                <button class="btn-secondary btn-sm">📄 Download PDF</button>
+                                <button class="btn-primary btn-sm">📤 Share with Clinician</button>
+                            </div>
+                        </div>
+
+                        <div class="rd-body">
+                            <!-- Risk Gauge -->
+                            <div class="risk-gauge">
+                                <div class="rg-circle high">
+                                    <div class="rg-label">Risk</div>
+                                    <div class="rg-val" style="color:var(--danger)">78%</div>
+                                </div>
+                                <div class="rg-info">
+                                    <h3>High Risk — Elevated Indicators Detected</h3>
+                                    <p>Multiple behavioral signals indicate elevated risk for Autism Spectrum Disorder.
+                                        This screening result suggests immediate follow-up with a developmental
+                                        pediatrician is recommended.</p>
+                                    <div class="rg-confidence">
+                                        <div class="rg-conf-label"><span>Model Confidence</span><span>84%</span></div>
+                                        <div class="rg-conf-bar">
+                                            <div class="rg-conf-fill" style="width:84%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Factor Breakdown -->
+                            <div class="factors-section">
+                                <div class="factors-title">🔬 Contributing Factors</div>
+                                <div class="factors-grid">
+                                    <div class="factor-item">
+                                        <div class="fi-header">
+                                            <span class="fi-name">Eye Contact / Social Gaze</span>
+                                            <span class="badge badge-high">High</span>
+                                        </div>
+                                        <div class="fi-bar">
+                                            <div class="fi-fill red" style="width:85%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="factor-item">
+                                        <div class="fi-header">
+                                            <span class="fi-name">Response to Name</span>
+                                            <span class="badge badge-high">High</span>
+                                        </div>
+                                        <div class="fi-bar">
+                                            <div class="fi-fill red" style="width:78%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="factor-item">
+                                        <div class="fi-header">
+                                            <span class="fi-name">Repetitive Behaviors</span>
+                                            <span class="badge badge-medium">Medium</span>
+                                        </div>
+                                        <div class="fi-bar">
+                                            <div class="fi-fill yellow" style="width:55%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="factor-item">
+                                        <div class="fi-header">
+                                            <span class="fi-name">Social Communication</span>
+                                            <span class="badge badge-high">High</span>
+                                        </div>
+                                        <div class="fi-bar">
+                                            <div class="fi-fill red" style="width:72%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="factor-item">
+                                        <div class="fi-header">
+                                            <span class="fi-name">Motor Patterns</span>
+                                            <span class="badge badge-low">Low</span>
+                                        </div>
+                                        <div class="fi-bar">
+                                            <div class="fi-fill green" style="width:25%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="factor-item">
+                                        <div class="fi-header">
+                                            <span class="fi-name">Emotional Regulation</span>
+                                            <span class="badge badge-medium">Medium</span>
+                                        </div>
+                                        <div class="fi-bar">
+                                            <div class="fi-fill yellow" style="width:50%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- AI Summary -->
+                            <div class="ai-summary-card">
+                                <div class="ais-title">🤖 AI-Generated Summary</div>
+                                <p class="ais-text">
+                                    Aiden (2.5 yrs, male) shows <strong>significant indicators</strong> across multiple
+                                    developmental domains. The strongest concern is in <strong>social gaze and eye
+                                        contact</strong> (85% contribution weight), followed by <strong>response to
+                                        name</strong> (78%). The M-CHAT component flagged 7 out of 20 items, placing him
+                                    above the critical threshold. Video analysis confirmed reduced eye contact duration
+                                    (averaging 1.2s vs 3.1s norm) and minimal joint attention behaviors. Motor patterns
+                                    appear age-appropriate. <strong>Immediate referral to a developmental pediatrician
+                                        and early intervention services is recommended.</strong>
+                                </p>
+                            </div>
+
+                            <!-- Recommendations -->
+                            <div class="factors-title">🎯 Recommended Next Steps</div>
+                            <div class="recommendations">
+                                <div class="rec-item">
+                                    <div class="rec-icon">👩‍⚕️</div>
+                                    <h4>Pediatrician Referral</h4>
+                                    <p>Schedule an appointment with a developmental pediatrician for comprehensive
+                                        evaluation.</p>
+                                </div>
+                                <div class="rec-item">
+                                    <div class="rec-icon">🧩</div>
+                                    <h4>Early Intervention</h4>
+                                    <p>Contact your local EI program to begin developmental support services.</p>
+                                </div>
+                                <div class="rec-item">
+                                    <div class="rec-icon">📈</div>
+                                    <h4>Follow-up Screening</h4>
+                                    <p>Repeat screening in 30 days to track progress and response to interventions.</p>
+                                </div>
+                            </div>
+
+                            <div class="detail-links">
+                                <a href="explainable-ai.html" class="btn-secondary btn-sm">🔍 View Detailed AI
+                                    Explanation</a>
+                                <a href="progress-tracking.html" class="btn-secondary btn-sm">📈 Track Progress</a>
+                                <a href="clinician-dashboard.html" class="btn-secondary btn-sm">👩‍⚕️ Clinician
+                                    Dashboard</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <footer class="nc-footer footer-sidebar">
+                <div class="footer-brand">🧠 NeuroCare AI</div>
+                <div class="footer-links"><a href="index.html">Home</a><a href="privacy.html">Privacy</a><a
+                        href="terms.html">Terms</a><a href="contact.html">Contact</a></div>
+                <div class="footer-copy">© 2026 NeuroCare AI. For screening purposes only.</div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script>
+        if (!NeuroCareAuth.isAuthenticated()) {
+            window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+        }
+
+        function filterReports(type, btn) {
+            document.querySelectorAll('.rl-filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function selectReport(el) {
+            document.querySelectorAll('.report-item').forEach(r => r.classList.remove('active'));
+            el.classList.add('active');
+        }
+    </script>
+</body>
+
+</html>

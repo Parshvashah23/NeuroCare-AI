@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NeuroCare AI — Video Behavioral Analysis</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    :root {
+      --bg: #020408;
+      --s1: #060c14;
+      --s2: #0a1220;
+      --s3: #0f1928;
+      --b: rgba(0, 212, 170, 0.1);
+      --bb: rgba(0, 212, 170, 0.22);
+      --a: #00d4aa;
+      --a2: #0ea5e9;
+      --a3: #f59e0b;
+      --r: #ef4444;
+      --g: #10b981;
+      --y: #f59e0b;
+      --v: #8b5cf6;
+      --t: #c8dff0;
+      --ts: #4a7090;
+      --td: #1a3050;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--t);
+      min-height: 100vh
+    }
+
+    /* BG scanlines */
+    .bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden
+    }
+
+    .scan {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0, 212, 170, 0.015) 3px, rgba(0, 212, 170, 0.015) 4px)
+    }
+
+    .glow1 {
+      position: absolute;
+      width: 800px;
+      height: 400px;
+      background: radial-gradient(ellipse, rgba(0, 212, 170, 0.06), transparent 70%);
+      top: 10%;
+      right: -200px;
+      filter: blur(60px)
+    }
+
+    .glow2 {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(ellipse, rgba(14, 165, 233, 0.06), transparent 70%);
+      bottom: 10%;
+      left: -100px;
+      filter: blur(80px)
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(2, 4, 8, 0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--b);
+      padding: 14px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--t)
+    }
+
+    .logo-mark {
+      width: 30px;
+      height: 30px;
+      background: linear-gradient(135deg, var(--a), var(--a2));
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px
+    }
+
+    .logo-name {
+      color: var(--a)
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 6px
+    }
+
+    .nav-link {
+      padding: 6px 14px;
+      border-radius: 7px;
+      font-size: .81rem;
+      font-weight: 500;
+      text-decoration: none;
+      color: var(--ts);
+      border: 1px solid transparent;
+      transition: all .2s
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: var(--a);
+      border-color: var(--b);
+      background: rgba(0, 212, 170, 0.05)
+    }
+
+    /* PAGE WRAP */
+    .page {
+      position: relative;
+      z-index: 1;
+      padding: 100px 48px 80px;
+      max-width: 1280px;
+      margin: 0 auto
+    }
+
+    /* HERO */
+    .hero-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 32px;
+      margin-bottom: 48px
+    }
+
+    .page-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .78rem;
+      background: var(--s2);
+      border: 1px solid var(--b);
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      background: rgba(0, 212, 170, 0.05)
+    }
+
+    .page-tag .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--a);
+      animation: blink 1.5s infinite
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .2
+      }
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -.03em;
+      line-height: 1.1;
+      margin-bottom: 20px
+    }
+
+    .grad {
+      background: linear-gradient(135deg, var(--a), var(--a2));
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent
+    }
+
+    .hero-sub {
+      color: var(--ts);
+      font-size: .93rem;
+      line-height: 1.7;
+      max-width: 480px
+    }
+
+    .hero-live {
+      background: var(--s1);
+      border: 1px solid var(--b);
+      border-radius: 16px;
+      padding: 20px;
+      min-width: 280px
+    }
+
+    .hl-title {
+      font-family: 'DM Sans', sans-serif;
+      font-size: .78rem;
+      color: var(--ts);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 14px
+    }
+
+    .hl-metrics {
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .hl-metric {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: .82rem
+    }
+
+    .hl-metric span:first-child {
+      color: var(--ts)
+    }
+
+    .hl-val {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500
+    }
+
+    .live-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--g);
+      display: inline-block;
+      animation: blink .8s infinite;
+      margin-right: 5px
+    }
+
+    /* VIDEO ANALYSIS WORKSPACE */
+    .workspace {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+      margin-bottom: 28px
+    }
+
+    /* VIDEO FRAME */
+    .video-frame {
+      background: var(--s1);
+      border: 1px solid var(--b);
+      border-radius: 20px;
+      overflow: hidden
+    }
+
+    .vf-top-bar {
+      background: var(--s2);
+      border-bottom: 1px solid var(--b);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    .vf-dots {
+      display: flex;
+      gap: 6px
+    }
+
+    .vf-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%
+    }
+
+    .vf-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: .72rem;
+      color: var(--ts);
+      flex: 1;
+      text-align: center
+    }
+
+    .vf-status {
+      font-family: 'DM Sans', sans-serif;
+      font-size: .7rem;
+      color: var(--a);
+      display: flex;
+      align-items: center;
+      gap: 5px
+    }
+
+    .video-canvas {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #000;
+      overflow: hidden;
+      cursor: crosshair
+    }
+
+    .vc-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px
+    }
+
+    .vc-icon {
+      font-size: 3rem
+    }
+
+    .vc-text {
+      font-size: .9rem;
+      color: var(--ts)
+    }
+
+    .vc-btn {
+      background: linear-gradient(135deg, var(--a), var(--a2));
+      color: #020408;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .88rem;
+      font-weight: 600;
+      border-radius: 10px;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      transition: all .2s
+    }
+
+    .vc-btn:hover {
+      opacity: .85
+    }
+
+    /* Overlay annotations */
+    .vc-overlays {
+      position: absolute;
+      inset: 0;
+      pointer-events: none
+    }
+
+    .face-box {
+      position: absolute;
+      border: 2px solid;
+      border-radius: 4px;
+      transition: all .3s
+    }
+
+    .fb-label {
+      position: absolute;
+      bottom: 100%;
+      left: 0;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .6rem;
+      padding: 2px 6px;
+      border-radius: 3px;
+      white-space: nowrap;
+      font-weight: 500
+    }
+
+    .gaze-line {
+      position: absolute;
+      height: 2px;
+      transform-origin: left center;
+      transition: all .3s
+    }
+
+    .heat-spot {
+      position: absolute;
+      border-radius: 50%;
+      opacity: .35;
+      transform: translate(-50%, -50%)
+    }
+
+    /* Video timeline */
+    .vf-timeline {
+      background: var(--s2);
+      border-top: 1px solid var(--b);
+      padding: 14px 20px
+    }
+
+    .timeline-bar {
+      height: 8px;
+      background: var(--s3);
+      border-radius: 100px;
+      position: relative;
+      cursor: pointer;
+      margin-bottom: 8px;
+      overflow: hidden
+    }
+
+    .tl-played {
+      height: 100%;
+      background: linear-gradient(90deg, var(--a), var(--a2));
+      border-radius: 100px;
+      transition: width .1s
+    }
+
+    .tl-markers {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
+      display: flex;
+      align-items: center
+    }
+
+    .tl-marker {
+      position: absolute;
+      width: 3px;
+      height: 100%;
+      border-radius: 1px;
+      opacity: .8
+    }
+
+    .timeline-labels {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .65rem;
+      color: var(--ts)
+    }
+
+    .tl-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 10px
+    }
+
+    .tl-btn {
+      background: var(--s3);
+      border: 1px solid var(--b);
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--ts);
+      font-size: .8rem;
+      transition: all .2s
+    }
+
+    .tl-btn:hover {
+      color: var(--a);
+      border-color: var(--bb)
+    }
+
+    .tl-time {
+      font-family: 'DM Sans', sans-serif;
+      font-size: .7rem;
+      color: var(--ts);
+      flex: 1;
+      text-align: center
+    }
+
+    .tl-speed {
+      font-family: 'DM Sans', sans-serif;
+      font-size: .7rem;
+      color: var(--a);
+      background: rgba(0, 212, 170, 0.08);
+      border: 1px solid var(--b);
+      border-radius: 5px;
+      padding: 3px 9px;
+      cursor: pointer
+    }
+
+    /* RIGHT PANEL */
+    .analysis-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px
+    }
+
+    .metric-card {
+      background: var(--s1);
+      border: 1px solid var(--b);
+      border-radius: 16px;
+      padding: 18px;
+      overflow: hidden;
+      position: relative
+    }
+
+    .metric-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 100%;
+      background: var(--a)
+    }
+
+    .mc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px
+    }
+
+    .mc-name {
+      font-size: .82rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 7px
+    }
+
+    .mc-icon {
+      font-size: .95rem
+    }
+
+    .mc-score {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 500
+    }
+
+    .mc-bar {
+      height: 5px;
+      background: var(--s3);
+      border-radius: 100px;
+      overflow: hidden;
+      margin-bottom: 8px
+    }
+
+    .mc-fill {
+      height: 100%;
+      border-radius: 100px;
+      transition: width 1.2s cubic-bezier(.34, 1.56, .64, 1)
+    }
+
+    .mc-detail {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .68rem;
+      color: var(--ts)
+    }
+
+    .realtime-graph {
+      background: var(--s1);
+      border: 1px solid var(--b);
+      border-radius: 16px;
+      padding: 18px
+    }
+
+    .rg-title {
+      font-size: .78rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 14px;
+      color: var(--ts)
+    }
+
+    .rg-canvas-wrap {
+      position: relative;
+      height: 100px
+    }
+
+    .rg-canvas {
+      width: 100%;
+      height: 100%
+    }
+
+    .rg-legend {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+      flex-wrap: wrap
+    }
+
+    .rg-leg {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: .7rem;
+      color: var(--ts)
+    }
+
+    .rg-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px
+    }
+
+    /* ANALYSIS MODES */
+    .mode-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      flex-wrap: wrap
+    }
+
+    .mode-btn {
+      border: 1px solid var(--b);
+      border-radius: 10px;
+      padding: 10px 18px;
+      cursor: pointer;
+      background: var(--s1);
+      color: var(--ts);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .88rem;
+      font-weight: 500;
+      transition: all .25s;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .mode-btn:hover {
+      border-color: var(--bb);
+      color: var(--t)
+    }
+
+    .mode-btn.active {
+      border-color: var(--a);
+      background: rgba(0, 212, 170, 0.07);
+      color: var(--a)
+    }
+
+    /* FRAME-BY-FRAME */
+    .frame-strip {
+      background: var(--s1);
+      border: 1px solid var(--b);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px
+    }
+
+    .fs-title {
+      font-size: .82rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .fs-frames {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--td) transparent
+    }
+
+    .frame-thumb {
+      flex-shrink: 0;
+      width: 100px;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all .2s;
+      position: relative
+    }
+
+    .frame-thumb:hover,
+    .frame-thumb.active {
+      border-color: var(--a)
+    }
+
+    .ft-img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: var(--s3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      color: var(--ts)
+    }
+
+    .ft-label {
+      padding: 4px 6px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .58rem;
+      color: var(--ts);
+      display: flex;
+      justify-content: space-between
+    }
+
+    .ft-flag {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%
+    }
+
+    /* HEATMAP */
+    .heatmap-section {
+      background: var(--s1);
+      border: 1px solid var(--b);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px
+    }
+
+    .hs-title {
+      font-size: .82rem;
+      font-weight: 600;
+      margin-bottom: 16px
+    }
+
+    .hs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px
+    }
+
+    .hm-cell {
+      background: var(--s2);
+      border-radius: 10px;
+      padding: 14px
+    }
+
+    .hm-cell h4 {
+      font-size: .78rem;
+      color: var(--ts);
+      margin-bottom: 10px
+    }
+
+    .hm-visual {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #000;
+      border-radius: 6px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .hm-base {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--s3), var(--s2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: var(--td)
+    }
+
+    .hm-overlay {
+      position: absolute;
+      inset: 0;
+      border-radius: 6px
+    }
+
+    /* BEHAVIORAL LOG */
+    .log-section {
+      background: var(--s1);
+      border: 1px solid var(--b);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px
+    }
+
+    .log-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px
+    }
+
+    .log-header h3 {
+      font-size: .88rem;
+      font-weight: 600
+    }
+
+    .log-filter {
+      display: flex;
+      gap: 6px
+    }
+
+    .lf-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: .68rem;
+      border: 1px solid var(--b);
+      border-radius: 5px;
+      padding: 3px 10px;
+      cursor: pointer;
+      background: transparent;
+      color: var(--ts);
+      transition: all .2s
+    }
+
+    .lf-btn.active {
+      border-color: var(--bb);
+      color: var(--a);
+      background: rgba(0, 212, 170, 0.06)
+    }
+
+    .log-entries {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 260px;
+      overflow-y: auto
+    }
+
+    .log-entry {
+      display: grid;
+      grid-template-columns: 60px 120px 1fr 60px;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      background: var(--s2);
+      border-radius: 8px;
+      font-size: .78rem;
+      border-left: 2px solid transparent;
+      transition: border-color .2s
+    }
+
+    .log-entry:hover {
+      border-left-color: var(--a)
+    }
+
+    .le-time {
+      font-family: 'DM Sans', sans-serif;
+      color: var(--ts)
+    }
+
+    .le-type {
+      font-weight: 600
+    }
+
+    .le-desc {
+      color: var(--ts)
+    }
+
+    .le-sev {
+      font-family: 'DM Sans', sans-serif;
+      font-size: .65rem;
+      padding: 2px 7px;
+      border-radius: 4px;
+      text-align: center
+    }
+
+    .sev-h {
+      background: rgba(239, 68, 68, .12);
+      color: var(--r)
+    }
+
+    .sev-m {
+      background: rgba(245, 158, 11, .1);
+      color: var(--y)
+    }
+
+    .sev-l {
+      background: rgba(16, 185, 129, .1);
+      color: var(--g)
+    }
+
+    /* SUMMARY */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px
+    }
+
+    .sum-card {
+      background: var(--s1);
+      border: 1px solid var(--b);
+      border-radius: 14px;
+      padding: 18px;
+      text-align: center
+    }
+
+    .sum-val {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      margin-bottom: 4px
+    }
+
+    .sum-label {
+      font-size: .75rem;
+      color: var(--ts)
+    }
+
+    .sum-trend {
+      font-size: .7rem;
+      margin-top: 6px
+    }
+
+    .trend-up {
+      color: var(--r)
+    }
+
+    .trend-dn {
+      color: var(--g)
+    }
+
+    .trend-neutral {
+      color: var(--ts)
+    }
+
+    @media(max-width:1024px) {
+      .workspace {
+        grid-template-columns: 1fr
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .hs-grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media(max-width:768px) {
+      nav {
+        padding: 14px 20px
+      }
+
+      .page {
+        padding: 90px 20px 60px
+      }
+
+      .mode-bar {
+        flex-wrap: wrap
+      }
+
+      .log-entry {
+        grid-template-columns: 50px 1fr 50px
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg">
+    <div class="scan"></div>
+    <div class="glow1"></div>
+    <div class="glow2"></div>
+  </div>
+
+  <nav class="nc-tool-topbar">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">🧠</div><span class="logo-name">NeuroCare</span>&nbsp;AI
+    </a>
+    <div class="tool-page-badge">🎥 Video Analysis</div>
+    <a href="#" class="tool-back-btn" onclick="window.location.href=NeuroCareAuth.getDashboardUrl();return false;">←
+      Back to Dashboard</a>
+  </nav>
+
+  <div class="page">
+    <div class="hero-row">
+      <div class="hero-text">
+        <div class="page-tag">
+          <div class="dot"></div>MODULE_02 // VIDEO_ANALYSIS
+        </div>
+        <h1>Video <span class="grad">Behavioral</span><br>Analysis</h1>
+        <p class="hero-sub">Frame-by-frame AI detection of facial attention, eye contact patterns, gesture frequency,
+          and repetitive motor behaviors from naturalistic home videos.</p>
+      </div>
+      <div class="hero-live">
+        <div class="hl-title">// live_metrics</div>
+        <div class="hl-metrics">
+          <div class="hl-metric"><span>FPS processed</span><span class="hl-val" style="color:var(--a)"
+              id="lm-fps">30</span></div>
+          <div class="hl-metric"><span>Frames analyzed</span><span class="hl-val" id="lm-frames">0</span></div>
+          <div class="hl-metric"><span>Faces detected</span><span class="hl-val" id="lm-faces">1</span></div>
+          <div class="hl-metric"><span>Model</span><span class="hl-val" style="color:var(--a2)">MediaPipe</span></div>
+          <div class="hl-metric"><span>Status</span><span class="hl-val"><span class="live-dot"></span><span
+                id="lm-status">Demo Mode</span></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODE BAR -->
+    <div class="mode-bar">
+      <button class="mode-btn active" onclick="setMode('realtime',this)">▶ Real-time Analysis</button>
+      <button class="mode-btn" onclick="setMode('frame',this)">🎞 Frame-by-Frame</button>
+      <button class="mode-btn" onclick="setMode('heatmap',this)">🔥 Attention Heatmap</button>
+      <button class="mode-btn" onclick="setMode('log',this)">📋 Behavioral Log</button>
+      <button class="mode-btn" onclick="setMode('summary',this)">📊 Summary Report</button>
+    </div>
+
+    <!-- REALTIME MODE -->
+    <div id="mode-realtime">
+      <div class="workspace">
+        <!-- VIDEO PLAYER -->
+        <div class="video-frame">
+          <div class="vf-top-bar">
+            <div class="vf-dots">
+              <div class="vf-dot" style="background:#ef4444"></div>
+              <div class="vf-dot" style="background:#f59e0b"></div>
+              <div class="vf-dot" style="background:#10b981"></div>
+            </div>
+            <div class="vf-label" style="font-family:'DM Sans',sans-serif">child_session_2024_12_14.mp4</div>
+            <div class="vf-status">
+              <div class="dot"
+                style="width:6px;height:6px;border-radius:50%;background:var(--a);animation:blink .8s infinite"></div>
+              ANALYZING
+            </div>
+          </div>
+
+          <div class="video-canvas" id="videoCanvas">
+            <div class="vc-placeholder" id="vcPlaceholder">
+              <div class="vc-icon">🎬</div>
+              <div class="vc-text">Click to load demo analysis</div>
+              <button class="vc-btn" onclick="startDemo()">▶ Run Demo Analysis</button>
+            </div>
+            <div class="vc-overlays" id="vcOverlays" style="display:none">
+              <!-- Simulated face detection box -->
+              <div class="face-box" id="faceBox" style="border-color:#00d4aa;top:20%;left:35%;width:28%;height:45%">
+                <div class="fb-label" style="background:rgba(0,212,170,0.8);color:#020408">FACE #1 | conf:0.94</div>
+              </div>
+              <!-- Gaze indicator -->
+              <div
+                style="position:absolute;top:42%;left:49%;width:8px;height:8px;background:var(--r);border-radius:50%;box-shadow:0 0 12px var(--r)"
+                id="gazePoint"></div>
+              <!-- Overlay label -->
+              <div
+                style="position:absolute;top:8px;left:8px;font-family:'DM Sans',sans-serif;font-size:.62rem;background:rgba(0,0,0,.7);border:1px solid var(--b);border-radius:5px;padding:6px 10px;line-height:1.7;color:var(--t)">
+                <div style="color:var(--a)">FRAME: <span id="frameNum">0847</span></div>
+                <div>EYE_CONTACT: <span id="overlayEC" style="color:var(--r)">LOW</span></div>
+                <div>FACE_ORIENT: <span id="overlayFO" style="color:var(--y)">AVERTED</span></div>
+                <div>MOTION: <span id="overlayMO" style="color:var(--g)">STILL</span></div>
+              </div>
+              <!-- Heatmap spots -->
+              <div class="heat-spot" id="hs1"
+                style="width:60px;height:60px;background:radial-gradient(var(--a),transparent);top:35%;left:45%"></div>
+              <div class="heat-spot" id="hs2"
+                style="width:40px;height:40px;background:radial-gradient(var(--r),transparent);top:60%;left:70%"></div>
+            </div>
+          </div>
+
+          <div class="vf-timeline">
+            <div class="timeline-bar" onclick="scrubTimeline(event,this)" id="tlBar">
+              <div class="tl-played" id="tlPlayed" style="width:35%"></div>
+              <div class="tl-markers" id="tlMarkers"></div>
+            </div>
+            <div class="timeline-labels">
+              <span>0:00</span><span>0:15</span><span>0:30</span><span>0:45</span><span>1:00</span>
+            </div>
+            <div class="tl-controls">
+              <div class="tl-btn" onclick="togglePlay()" id="playBtn">▶</div>
+              <div class="tl-btn">⏮</div>
+              <div class="tl-btn">⏭</div>
+              <div class="tl-time"><span id="tlCurrent">0:21</span> / 1:00</div>
+              <div class="tl-speed" onclick="cycleSpeed()" id="speedBtn">1×</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT METRICS -->
+        <div class="analysis-panel">
+          <div class="metric-card" style="--a:var(--a)">
+            <div class="mc-header">
+              <div class="mc-name">
+                <div class="mc-icon">👁️</div>Eye Contact Score
+              </div>
+              <div class="mc-score" id="m-eye" style="color:var(--r)">—</div>
+            </div>
+            <div class="mc-bar">
+              <div class="mc-fill" id="mf-eye" style="background:var(--r);width:0%"></div>
+            </div>
+            <div class="mc-detail"><span>Baseline: 75%+</span><span id="md-eye">Calculating…</span></div>
+          </div>
+          <div class="metric-card">
+            <div class="mc-header">
+              <div class="mc-name">
+                <div class="mc-icon">👀</div>Face Attention
+              </div>
+              <div class="mc-score" id="m-face" style="color:var(--y)">—</div>
+            </div>
+            <div class="mc-bar">
+              <div class="mc-fill" id="mf-face" style="background:var(--y);width:0%"></div>
+            </div>
+            <div class="mc-detail"><span>Baseline: 80%+</span><span id="md-face">Calculating…</span></div>
+          </div>
+          <div class="metric-card">
+            <div class="mc-header">
+              <div class="mc-name">
+                <div class="mc-icon">🤲</div>Gesture Frequency
+              </div>
+              <div class="mc-score" id="m-gest" style="color:var(--y)">—</div>
+            </div>
+            <div class="mc-bar">
+              <div class="mc-fill" id="mf-gest" style="background:var(--y);width:0%"></div>
+            </div>
+            <div class="mc-detail"><span>Baseline: 65%+</span><span id="md-gest">Calculating…</span></div>
+          </div>
+          <div class="metric-card">
+            <div class="mc-header">
+              <div class="mc-name">
+                <div class="mc-icon">🔄</div>Repetitive Motion
+              </div>
+              <div class="mc-score" id="m-rep" style="color:var(--r)">—</div>
+            </div>
+            <div class="mc-bar">
+              <div class="mc-fill" id="mf-rep" style="background:var(--r);width:0%"></div>
+            </div>
+            <div class="mc-detail"><span>Threshold: &lt;25%</span><span id="md-rep">Calculating…</span></div>
+          </div>
+          <div class="metric-card">
+            <div class="mc-header">
+              <div class="mc-name">
+                <div class="mc-icon">👥</div>Social Referencing
+              </div>
+              <div class="mc-score" id="m-social" style="color:var(--r)">—</div>
+            </div>
+            <div class="mc-bar">
+              <div class="mc-fill" id="mf-social" style="background:var(--r);width:0%"></div>
+            </div>
+            <div class="mc-detail"><span>Baseline: 70%+</span><span id="md-social">Calculating…</span></div>
+          </div>
+
+          <!-- Mini graph -->
+          <div class="realtime-graph">
+            <div class="rg-title">📈 Real-time Signal Trace</div>
+            <div class="rg-canvas-wrap">
+              <canvas class="rg-canvas" id="rtCanvas"></canvas>
+            </div>
+            <div class="rg-legend">
+              <div class="rg-leg">
+                <div class="rg-dot" style="background:var(--a)"></div>Eye Contact
+              </div>
+              <div class="rg-leg">
+                <div class="rg-dot" style="background:var(--r)"></div>Repetitive
+              </div>
+              <div class="rg-leg">
+                <div class="rg-dot" style="background:var(--y)"></div>Gesture
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FRAME MODE -->
+    <div id="mode-frame" style="display:none">
+      <div class="frame-strip">
+        <div class="fs-title">
+          <span>Frame-by-Frame Analysis — Click any frame to inspect</span>
+          <span style="font-family:'DM Sans',sans-serif;font-size:.7rem;color:var(--ts)">60 frames @ 1fps</span>
+        </div>
+        <div class="fs-frames" id="frameStrip"></div>
+      </div>
+      <div style="background:var(--s1);border:1px solid var(--b);border-radius:16px;padding:24px" id="frameDetail">
+        <div style="font-size:.85rem;color:var(--ts);text-align:center">Select a frame above to inspect detailed
+          behavioral signals</div>
+      </div>
+    </div>
+
+    <!-- HEATMAP MODE -->
+    <div id="mode-heatmap" style="display:none">
+      <div class="heatmap-section">
+        <div class="hs-title">Attention & Motion Heatmaps — Where does the child look and move?</div>
+        <div class="hs-grid">
+          <div class="hm-cell">
+            <h4>Face Attention Distribution</h4>
+            <div class="hm-visual">
+              <div class="hm-base">🎬</div>
+              <div class="hm-overlay" id="heatFace"></div>
+            </div>
+          </div>
+          <div class="hm-cell">
+            <h4>Gaze Direction Heatmap</h4>
+            <div class="hm-visual">
+              <div class="hm-base">🎬</div>
+              <div class="hm-overlay" id="heatGaze"></div>
+            </div>
+          </div>
+          <div class="hm-cell">
+            <h4>Motion Density Map</h4>
+            <div class="hm-visual">
+              <div class="hm-base">🎬</div>
+              <div class="hm-overlay" id="heatMotion"></div>
+            </div>
+          </div>
+          <div class="hm-cell">
+            <h4>Social Referencing Events</h4>
+            <div class="hm-visual">
+              <div class="hm-base">🎬</div>
+              <div class="hm-overlay" id="heatSocial"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOG MODE -->
+    <div id="mode-log" style="display:none">
+      <div class="log-section">
+        <div class="log-header">
+          <h3>📋 Behavioral Event Log</h3>
+          <div class="log-filter">
+            <button class="lf-btn active" onclick="filterLog('all',this)">ALL</button>
+            <button class="lf-btn" onclick="filterLog('high',this)">HIGH</button>
+            <button class="lf-btn" onclick="filterLog('medium',this)">MEDIUM</button>
+            <button class="lf-btn" onclick="filterLog('low',this)">LOW</button>
+          </div>
+        </div>
+        <div class="log-entries" id="logEntries"></div>
+      </div>
+    </div>
+
+    <!-- SUMMARY MODE -->
+    <div id="mode-summary" style="display:none">
+      <div class="summary-grid">
+        <div class="sum-card">
+          <div class="sum-val" style="color:var(--r)">32%</div>
+          <div class="sum-label">Eye Contact Score</div>
+          <div class="sum-trend trend-up">↑ ASD indicator</div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-val" style="color:var(--r)">78%</div>
+          <div class="sum-label">Repetitive Motion</div>
+          <div class="sum-trend trend-up">↑ Above threshold</div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-val" style="color:var(--y)">38%</div>
+          <div class="sum-label">Gesture Frequency</div>
+          <div class="sum-trend trend-up">↓ Below baseline</div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-val" style="color:var(--r)">28%</div>
+          <div class="sum-label">Social Referencing</div>
+          <div class="sum-trend trend-up">↑ ASD indicator</div>
+        </div>
+      </div>
+      <div style="background:var(--s1);border:1px solid var(--b);border-radius:16px;padding:24px;margin-bottom:24px">
+        <h3 style="font-weight:600;font-size:1rem;margin-bottom:16px">📊 Full Session Analysis Summary</h3>
+        <p style="color:var(--ts);font-size:.88rem;line-height:1.75">The 60-second video analysis identified <strong
+            style="color:var(--t)">14 behavioral events</strong> of concern across 5 detection modules. Eye contact was
+          maintained for an estimated <strong style="color:var(--r)">32% of frames</strong> (typical: 75%+). Repetitive
+          motor patterns were detected in <strong style="color:var(--r)">78% of frames</strong>, including bilateral
+          hand movements and body-rocking episodes. Gesture use was limited to 3 events (imperative only) with no
+          declarative pointing observed. Social referencing events totaled 2 instances over the full session. These
+          findings combine to generate a <strong style="color:var(--t)">high-risk video signal</strong> contributing 35%
+          to the overall screening score.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let demoRunning = false;
+    let playing = false;
+    let frameProgress = 35;
+    let playInterval;
+    let speedIndex = 0;
+    const speeds = ['1×', '2×', '0.5×'];
+
+    const LOG_DATA = [
+      { time: '0:02', type: 'Eye Aversion', desc: 'Gaze directed away from caregiver face', sev: 'high' },
+      { time: '0:05', type: 'Hand Flap', desc: 'Bilateral hand flapping detected, 2.3s duration', sev: 'high' },
+      { time: '0:08', type: 'Low Eye Contact', desc: 'Face attention score dropped to 18%', sev: 'high' },
+      { time: '0:11', type: 'No Response', desc: 'Name called by caregiver — no orienting response', sev: 'high' },
+      { time: '0:14', type: 'Body Rock', desc: 'Repetitive rocking motion, 4.1s duration', sev: 'medium' },
+      { time: '0:17', type: 'Gesture Absent', desc: 'Toy reached for — no pointing observed', sev: 'medium' },
+      { time: '0:20', type: 'Brief Eye Contact', desc: '0.8s eye contact with caregiver', sev: 'low' },
+      { time: '0:24', type: 'Hand Flap', desc: 'Bilateral hand flapping, 1.8s duration', sev: 'high' },
+      { time: '0:27', type: 'Eye Aversion', desc: 'Persistent gaze aversion during feeding', sev: 'high' },
+      { time: '0:31', type: 'Social Smile', desc: 'Brief social smile response — present', sev: 'low' },
+      { time: '0:35', type: 'Spin Behavior', desc: 'Object spinning repetitive behavior detected', sev: 'medium' },
+      { time: '0:39', type: 'No Joint Attn', desc: 'Caregiver point gesture — no following gaze', sev: 'medium' },
+      { time: '0:44', type: 'Hand Flap', desc: 'Bilateral hand flapping, 3.2s duration', sev: 'high' },
+      { time: '0:51', type: 'Face Attention', desc: 'Sustained face look, 1.2s — positive signal', sev: 'low' },
+    ];
+
+    const FRAME_DATA = Array.from({ length: 30 }, (_, i) => ({
+      id: i + 1,
+      time: `0:${String(i * 2).padStart(2, '0')}`,
+      eye: Math.round(20 + Math.random() * 50),
+      motion: Math.round(Math.random() * 80),
+      face: Math.random() > 0.3,
+      flag: Math.random() > 0.65 ? 'high' : Math.random() > 0.5 ? 'medium' : 'low'
+    }));
+
+    function setMode(mode, btn) {
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      ['realtime', 'frame', 'heatmap', 'log', 'summary'].forEach(m => {
+        document.getElementById('mode-' + m).style.display = m === mode ? 'block' : 'none';
+      });
+      if (mode === 'frame') renderFrames();
+      if (mode === 'log') renderLog('all');
+      if (mode === 'heatmap') renderHeatmaps();
+    }
+
+    function startDemo() {
+      document.getElementById('vcPlaceholder').style.display = 'none';
+      document.getElementById('vcOverlays').style.display = 'block';
+      demoRunning = true;
+      document.getElementById('lm-status').textContent = 'Analyzing';
+      animateMetrics();
+      animateRealtime();
+      addTimelineMarkers();
+      startPlayback();
+    }
+
+    function animateMetrics() {
+      const targets = { eye: 32, face: 45, gest: 38, rep: 78, social: 28 };
+      const colors = { eye: 'var(--r)', face: 'var(--y)', gest: 'var(--y)', rep: 'var(--r)', social: 'var(--r)' };
+      const labels = { eye: 'Significantly below baseline', face: 'Below typical range', gest: 'Below baseline', rep: 'Highly elevated — flag', social: 'Absent — ASD indicator' };
+      let frames = 0;
+      const iv = setInterval(() => {
+        frames++;
+        const prog = Math.min(frames / 40, 1);
+        const ease = 1 - Math.pow(1 - prog, 3);
+        Object.keys(targets).forEach(k => {
+          const val = Math.round(targets[k] * ease);
+          document.getElementById('m-' + k).textContent = val + '%';
+          document.getElementById('mf-' + k).style.width = val + '%';
+          document.getElementById('lm-frames').textContent = Math.round(1800 * ease);
+        });
+        if (prog >= 1) {
+          clearInterval(iv);
+          Object.keys(labels).forEach(k => document.getElementById('md-' + k).textContent = labels[k]);
+        }
+      }, 30);
+    }
+
+    let rtData = { eye: [], rep: [], gest: [] };
+    function animateRealtime() {
+      const canvas = document.getElementById('rtCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      const W = canvas.width, H = canvas.height;
+      let t = 0;
+
+      setInterval(() => {
+        t++;
+        rtData.eye.push(30 + Math.sin(t * 0.3) * 15 + Math.random() * 10);
+        rtData.rep.push(70 + Math.sin(t * 0.2) * 15 + Math.random() * 10);
+        rtData.gest.push(35 + Math.sin(t * 0.4) * 12 + Math.random() * 8);
+        if (rtData.eye.length > 50) { rtData.eye.shift(); rtData.rep.shift(); rtData.gest.shift(); }
+
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = 'rgba(10,18,32,0.3)';
+        ctx.fillRect(0, 0, W, H);
+
+        // Grid lines
+        ctx.strokeStyle = 'rgba(26,48,80,0.5)';
+        ctx.lineWidth = 1;
+        [25, 50, 75].forEach(y => {
+          const py = H - (y / 100) * H;
+          ctx.beginPath(); ctx.moveTo(0, py); ctx.lineTo(W, py); ctx.stroke();
+          ctx.fillStyle = 'rgba(74,112,144,0.6)';
+          ctx.font = '8px JetBrains Mono';
+          ctx.fillText(y + '%', 2, py - 2);
+        });
+
+        [[rtData.eye, '#00d4aa'], [rtData.rep, '#ef4444'], [rtData.gest, '#f59e0b']].forEach(([data, color]) => {
+          if (data.length < 2) return;
+          ctx.beginPath();
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 1.5;
+          data.forEach((v, i) => {
+            const x = (i / (data.length - 1)) * W;
+            const y = H - (v / 100) * H;
+            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          });
+          ctx.stroke();
+        });
+
+        // Animate face box
+        if (demoRunning) {
+          const dx = Math.sin(t * 0.15) * 3;
+          const dy = Math.cos(t * 0.1) * 2;
+          document.getElementById('faceBox').style.transform = `translate(${dx}px,${dy}px)`;
+          const gx = 45 + Math.sin(t * 0.4) * 12;
+          const gy = 40 + Math.cos(t * 0.3) * 8;
+          document.getElementById('gazePoint').style.left = gx + '%';
+          document.getElementById('gazePoint').style.top = gy + '%';
+          document.getElementById('frameNum').textContent = String(800 + t * 3).padStart(4, '0');
+          const ecStates = ['LOW', 'AVERTED', 'AVERTED', 'BRIEF'];
+          const moStates = ['STILL', 'MOTION', 'STILL', 'ROCKING'];
+          document.getElementById('overlayEC').textContent = ecStates[t % 4];
+          document.getElementById('overlayFO').textContent = t % 3 === 0 ? 'DIRECT' : 'AVERTED';
+          document.getElementById('overlayMO').textContent = moStates[t % 4];
+        }
+      }, 100);
+    }
+
+    function addTimelineMarkers() {
+      const container = document.getElementById('tlMarkers');
+      const events = [{ pos: 8, sev: 'h' }, { pos: 15, sev: 'h' }, { pos: 22, sev: 'm' }, { pos: 35, sev: 'h' }, { pos: 44, sev: 'h' }, { pos: 52, sev: 'm' }, { pos: 68, sev: 'm' }, { pos: 78, sev: 'l' }, { pos: 88, sev: 'h' }];
+      const colors = { h: 'var(--r)', m: 'var(--y)', l: 'var(--g)' };
+      container.innerHTML = events.map(e => `<div class="tl-marker" style="left:${e.pos}%;background:${colors[e.sev]}"></div>`).join('');
+    }
+
+    function togglePlay() {
+      playing = !playing;
+      document.getElementById('playBtn').textContent = playing ? '⏸' : '▶';
+      if (playing) {
+        if (!demoRunning) startDemo();
+        playInterval = setInterval(() => {
+          frameProgress = Math.min(frameProgress + 0.3, 100);
+          document.getElementById('tlPlayed').style.width = frameProgress + '%';
+          const secs = Math.round(frameProgress * 0.6);
+          document.getElementById('tlCurrent').textContent = `0:${String(secs).padStart(2, '0')}`;
+          if (frameProgress >= 100) { clearInterval(playInterval); playing = false; document.getElementById('playBtn').textContent = '▶'; }
+        }, 100);
+      } else {
+        clearInterval(playInterval);
+      }
+    }
+
+    function scrubTimeline(e, bar) {
+      const rect = bar.getBoundingClientRect();
+      frameProgress = ((e.clientX - rect.left) / rect.width) * 100;
+      document.getElementById('tlPlayed').style.width = frameProgress + '%';
+      if (!demoRunning) startDemo();
+    }
+
+    function cycleSpeed() {
+      speedIndex = (speedIndex + 1) % speeds.length;
+      document.getElementById('speedBtn').textContent = speeds[speedIndex];
+    }
+
+    function renderFrames() {
+      document.getElementById('frameStrip').innerHTML = FRAME_DATA.map((f, i) =>
+        `<div class="frame-thumb${i === 4 ? ' active' : ''}" onclick="showFrameDetail(${i})">
+      <div class="ft-img">${f.face ? '🟢' : '🔴'}</div>
+      <div class="ft-label"><span>${f.time}</span><span style="color:${f.eye < 40 ? 'var(--r)' : f.eye < 60 ? 'var(--y)' : 'var(--g)'}">${f.eye}%</span></div>
+      <div class="ft-flag" style="background:${f.flag === 'high' ? 'var(--r)' : f.flag === 'medium' ? 'var(--y)' : 'var(--g)'}"></div>
+    </div>`
+      ).join('');
+      showFrameDetail(4);
+    }
+
+    function showFrameDetail(i) {
+      document.querySelectorAll('.frame-thumb').forEach((el, j) => el.classList.toggle('active', j === i));
+      const f = FRAME_DATA[i];
+      const flagColor = f.flag === 'high' ? 'var(--r)' : f.flag === 'medium' ? 'var(--y)' : 'var(--g)';
+      document.getElementById('frameDetail').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px">
+      <div style="text-align:center"><div style="font-size:1.6rem;font-weight:700;color:${f.eye < 40 ? 'var(--r)' : f.eye < 60 ? 'var(--y)' : 'var(--g)'};font-family:'JetBrains Mono',monospace">${f.eye}%</div><div style="font-size:.75rem;color:var(--ts);margin-top:4px">Eye Contact</div></div>
+      <div style="text-align:center"><div style="font-size:1.6rem;font-weight:700;color:var(--y);font-family:'JetBrains Mono',monospace">${f.motion}%</div><div style="font-size:.75rem;color:var(--ts);margin-top:4px">Motion Level</div></div>
+      <div style="text-align:center"><div style="font-size:1.6rem;font-weight:700;color:${f.face ? 'var(--g)' : 'var(--r)'};font-family:'JetBrains Mono',monospace">${f.face ? 'YES' : 'NO'}</div><div style="font-size:.75rem;color:var(--ts);margin-top:4px">Face Detected</div></div>
+      <div style="text-align:center"><div style="font-size:1.6rem;font-weight:700;color:${flagColor};font-family:'JetBrains Mono',monospace">${f.flag.toUpperCase()}</div><div style="font-size:.75rem;color:var(--ts);margin-top:4px">Risk Flag</div></div>
+    </div>`;
+    }
+
+    function renderLog(filter) {
+      let data = LOG_DATA;
+      if (filter !== 'all') data = LOG_DATA.filter(e => e.sev === filter);
+      document.getElementById('logEntries').innerHTML = data.map(e =>
+        `<div class="log-entry"><span class="le-time">${e.time}</span><span class="le-type">${e.type}</span><span class="le-desc">${e.desc}</span><span class="le-sev sev-${e.sev[0]}">${e.sev.toUpperCase()}</span></div>`
+      ).join('');
+    }
+
+    function filterLog(filter, btn) {
+      document.querySelectorAll('.lf-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderLog(filter);
+    }
+
+    function renderHeatmaps() {
+      const maps = [
+        { id: 'heatFace', spots: [{ x: 48, y: 38, r: 60, c: 'rgba(0,212,170' }, { x: 30, y: 70, r: 35, c: 'rgba(0,212,170' }, { x: 65, y: 55, r: 25, c: 'rgba(0,212,170' }] },
+        { id: 'heatGaze', spots: [{ x: 70, y: 40, r: 50, c: 'rgba(239,68,68' }, { x: 15, y: 60, r: 40, c: 'rgba(239,68,68' }, { x: 50, y: 80, r: 30, c: 'rgba(245,158,11' }] },
+        { id: 'heatMotion', spots: [{ x: 40, y: 60, r: 70, c: 'rgba(139,92,246' }, { x: 60, y: 30, r: 45, c: 'rgba(139,92,246' }, { x: 25, y: 45, r: 30, c: 'rgba(139,92,246' }] },
+        { id: 'heatSocial', spots: [{ x: 50, y: 42, r: 30, c: 'rgba(16,185,129' }, { x: 55, y: 45, r: 15, c: 'rgba(16,185,129' }] }
+      ];
+      maps.forEach(m => {
+        const el = document.getElementById(m.id);
+        el.innerHTML = m.spots.map(s =>
+          `<div style="position:absolute;left:${s.x}%;top:${s.y}%;width:${s.r}px;height:${s.r}px;transform:translate(-50%,-50%);background:radial-gradient(${s.c},0.5),transparent);border-radius:50%;pointer-events:none"></div>`
+        ).join('');
+      });
+    }
+  </script>
+  <footer class="nc-footer" style="padding:24px 32px; margin-top: 40px;">
+    <div class="footer-brand">🧠 NeuroCare AI</div>
+    <div class="footer-links"><a href="index.html">Home</a><a href="privacy.html">Privacy</a><a
+        href="terms.html">Terms</a><a href="contact.html">Contact</a></div>
+    <div class="footer-copy">© 2026 NeuroCare AI. For screening purposes only.</div>
+  </footer>
+  <script src="js/auth.js"></script>
+  <script src="js/navigation.js"></script>
+  <script>
+    if (!NeuroCareAuth.isAuthenticated()) {
+      window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NeuroCare AI — Explainable AI</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    :root {
+      --bg: #06080d;
+      --s1: #0b0f18;
+      --s2: #101520;
+      --s3: #161c28;
+      --b: rgba(120, 140, 255, 0.1);
+      --bb: rgba(120, 140, 255, 0.22);
+      --a: #7c8dff;
+      --a2: #c084fc;
+      --a3: #38bdf8;
+      --g: #34d399;
+      --r: #f87171;
+      --y: #fbbf24;
+      --t: #dde3f5;
+      --ts: #6b7a99;
+      --td: #2d3554;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--t);
+      min-height: 100vh
+    }
+
+    /* BG */
+    .bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none
+    }
+
+    .bg-dots {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(120, 140, 255, 0.08) 1px, transparent 1px);
+      background-size: 28px 28px
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: .4
+    }
+
+    .b1 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(ellipse, rgba(124, 141, 255, 0.12), transparent 70%);
+      top: -200px;
+      left: -100px
+    }
+
+    .b2 {
+      width: 500px;
+      height: 400px;
+      background: radial-gradient(ellipse, rgba(192, 132, 252, 0.1), transparent 70%);
+      bottom: 0;
+      right: -100px
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(6, 8, 13, 0.85);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--b);
+      padding: 14px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--t)
+    }
+
+    .logo-icon {
+      width: 30px;
+      height: 30px;
+      background: linear-gradient(135deg, var(--a), var(--a2));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px
+    }
+
+    .logo span {
+      background: linear-gradient(90deg, var(--a), var(--a2));
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 8px
+    }
+
+    .nav-link {
+      padding: 7px 16px;
+      border-radius: 8px;
+      font-size: 0.83rem;
+      font-weight: 500;
+      text-decoration: none;
+      color: var(--ts);
+      border: 1px solid transparent;
+      transition: all .2s
+    }
+
+    .nav-link:hover {
+      color: var(--t);
+      border-color: var(--b)
+    }
+
+    .nav-link.active {
+      color: var(--a);
+      border-color: var(--bb);
+      background: rgba(124, 141, 255, 0.07)
+    }
+
+    /* HERO */
+    .hero {
+      padding: 130px 48px 60px;
+      position: relative;
+      z-index: 1
+    }
+
+    .hero-inner {
+      max-width: 1200px;
+      margin: 0 auto
+    }
+
+    .page-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(124, 141, 255, 0.08);
+      border: 1px solid rgba(124, 141, 255, 0.2);
+      border-radius: 100px;
+      padding: 5px 16px;
+      font-size: 0.77rem;
+      font-weight: 600;
+      color: var(--a);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: 20px
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -.03em;
+      line-height: 1.1;
+      margin-bottom: 20px
+    }
+
+    .grad {
+      background: linear-gradient(135deg, var(--a), var(--a2));
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent
+    }
+
+    .hero-sub {
+      font-family: 'DM Sans', sans-serif;
+      color: var(--ts);
+      font-size: .93rem;
+      line-height: 1.7;
+      max-width: 480px;
+      margin-bottom: 32px
+    }
+
+    /* MAIN */
+    .main {
+      padding: 0 48px 80px;
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto
+    }
+
+    /* CASE SELECTOR */
+    .case-selector {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 40px;
+      flex-wrap: wrap
+    }
+
+    .case-btn {
+      border: 1px solid var(--b);
+      border-radius: 12px;
+      padding: 14px 20px;
+      cursor: pointer;
+      background: var(--s1);
+      color: var(--ts);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .85rem;
+      font-weight: 500;
+      transition: all .25s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 180px
+    }
+
+    .case-btn:hover {
+      border-color: var(--bb);
+      color: var(--t)
+    }
+
+    .case-btn.active {
+      border-color: var(--a);
+      background: rgba(124, 141, 255, 0.08);
+      color: var(--t)
+    }
+
+    .cb-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0
+    }
+
+    .cb-name {
+      font-weight: 600;
+      font-size: .88rem
+    }
+
+    .cb-risk {
+      font-size: .73rem;
+      margin-top: 2px
+    }
+
+    .risk-h {
+      color: var(--r)
+    }
+
+    .risk-m {
+      color: var(--y)
+    }
+
+    .risk-l {
+      color: var(--g)
+    }
+
+    /* EXPLANATION ENGINE */
+    .xai-grid {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 24px;
+      margin-bottom: 28px
+    }
+
+    .model-card {
+      background: var(--s1);
+      border: 1px solid var(--b);
+      border-radius: 20px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .model-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--a), var(--a2))
+    }
+
+    .mc-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .85rem;
+      color: var(--ts);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 20px
+    }
+
+    .score-ring-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 24px
+    }
+
+    .score-ring {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 12px
+    }
+
+    .ring-svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg)
+    }
+
+    .ring-track {
+      fill: none;
+      stroke: var(--s3);
+      stroke-width: 12
+    }
+
+    .ring-fill {
+      fill: none;
+      stroke-width: 12;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1.4s cubic-bezier(.34, 1.56, .64, 1)
+    }
+
+    .ring-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center
+    }
+
+    .metric-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -.02em
+    }
+
+    .ring-lbl {
+      font-size: .68rem;
+      color: var(--ts);
+      text-transform: uppercase;
+      letter-spacing: .08em
+    }
+
+    .risk-badge {
+      padding: 6px 18px;
+      border-radius: 100px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .85rem;
+      text-align: center;
+      display: inline-block;
+      margin-bottom: 16px
+    }
+
+    .rb-h {
+      background: rgba(248, 113, 113, .1);
+      color: var(--r);
+      border: 1px solid rgba(248, 113, 113, .2)
+    }
+
+    .rb-m {
+      background: rgba(251, 191, 36, .1);
+      color: var(--y);
+      border: 1px solid rgba(251, 191, 36, .2)
+    }
+
+    .rb-l {
+      background: rgba(52, 211, 153, .1);
+      color: var(--g);
+      border: 1px solid rgba(52, 211, 153, .2)
+    }
+
+    .conf-block {
+      width: 100%;
+      font-size: .8rem;
+      color: var(--ts);
+      margin-top: 4px
+    }
+
+    .conf-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px
+    }
+
+    .conf-bar {
+      height: 5px;
+      background: var(--s3);
+      border-radius: 100px;
+      overflow: hidden
+    }
+
+    .conf-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: linear-gradient(90deg, var(--a), var(--a2));
+      transition: width 1.2s ease
+    }
+
+    .mc-breakdown {
+      margin-top: 20px;
+      border-top: 1px solid var(--b);
+      padding-top: 20px
+    }
+
+    .mc-breakdown-title {
+      font-size: .75rem;
+      color: var(--ts);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 12px
+    }
+
+    .comp-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      font-size: .82rem
+    }
+
+    .comp-label {
+      flex: 1;
+      color: var(--ts)
+    }
+
+    .comp-bar-wrap {
+      width: 80px;
+      height: 5px;
+      background: var(--s3);
+      border-radius: 100px;
+      overflow: hidden
+    }
+
+    .comp-fill {
+      height: 100%;
+      border-radius: 100px;
+      transition: width 1s ease
+    }
+
+    .comp-val {
+      font-weight: 600;
+      min-width: 32px;
+      text-align: right
+    }
+
+    /* FACTOR BREAKDOWN */
+    .factors-panel {
+      background: var(--s1);
+      border: 1px solid var(--b);
+      border-radius: 20px;
+      overflow: hidden
+    }
+
+    .fp-header {
+      background: var(--s2);
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--b);
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .fp-header h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem
+    }
+
+    .fp-tabs {
+      display: flex;
+      gap: 4px
+    }
+
+    .fp-tab {
+      font-family: 'DM Sans', sans-serif;
+      font-size: .78rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--ts);
+      transition: all .2s
+    }
+
+    .fp-tab.active {
+      background: rgba(124, 141, 255, .1);
+      color: var(--a)
+    }
+
+    .fp-body {
+      padding: 24px
+    }
+
+    .factor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px
+    }
+
+    .factor-card {
+      background: var(--s2);
+      border: 1px solid var(--b);
+      border-radius: 14px;
+      padding: 18px;
+      transition: all .25s;
+      cursor: pointer
+    }
+
+    .factor-card:hover {
+      border-color: var(--bb);
+      transform: translateY(-2px)
+    }
+
+    .factor-card.highlighted {
+      border-color: var(--a);
+      background: rgba(124, 141, 255, .06)
+    }
+
+    .fc-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 12px
+    }
+
+    .fc-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem
+    }
+
+    .fc-weight {
+      font-family: 'Syne', sans-serif;
+      font-size: .75rem;
+      font-weight: 700;
+      color: var(--ts);
+      background: var(--s3);
+      padding: 3px 9px;
+      border-radius: 100px
+    }
+
+    .feature-card h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .95rem;
+      margin-bottom: 12px
+    }
+
+    .fc-desc {
+      font-size: .78rem;
+      color: var(--ts);
+      line-height: 1.5;
+      margin-bottom: 12px
+    }
+
+    .fc-meter {
+      height: 6px;
+      background: var(--s3);
+      border-radius: 100px;
+      overflow: hidden
+    }
+
+    .fc-fill {
+      height: 100%;
+      border-radius: 100px;
+      transition: width 1.2s cubic-bezier(.34, 1.56, .64, 1)
+    }
+
+    /* SHAP-STYLE CHART */
+    .code-block {
+      font-family: 'DM Sans', sans-serif;
+      font-size: .78rem;
+      background: var(--s2);
+      border: 1px solid var(--b);
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin-bottom: 8px
+    }
+
+    .shap-section {
+      background: var(--s1);
+      border: 1px solid var(--b);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 28px
+    }
+
+    .shap-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      margin-bottom: 6px
+    }
+
+    .shap-sub {
+      font-size: .83rem;
+      color: var(--ts);
+      margin-bottom: 24px
+    }
+
+    .shap-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+
+    .shap-row {
+      display: grid;
+      grid-template-columns: 200px 1fr 60px;
+      align-items: center;
+      gap: 12px
+    }
+
+    .shap-label {
+      font-size: .83rem;
+      text-align: right;
+      color: var(--t)
+    }
+
+    .shap-bar-area {
+      position: relative;
+      height: 24px;
+      display: flex;
+      align-items: center
+    }
+
+    .shap-center {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--td);
+      z-index: 1
+    }
+
+    .shap-bar-pos,
+    .shap-bar-neg {
+      position: absolute;
+      height: 14px;
+      border-radius: 3px;
+      top: 50%;
+      transform: translateY(-50%);
+      transition: width 1s ease
+    }
+
+    .shap-bar-pos {
+      left: 50%;
+      background: linear-gradient(90deg, rgba(248, 113, 113, .3), var(--r))
+    }
+
+    .shap-bar-neg {
+      right: 50%;
+      background: linear-gradient(90deg, var(--g), rgba(52, 211, 153, .3))
+    }
+
+    .shap-val {
+      font-size: .82rem;
+      font-weight: 600;
+      text-align: left
+    }
+
+    /* DECISION TREE */
+    .tree-section {
+      background: var(--s1);
+      border: 1px solid var(--b);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 28px
+    }
+
+    .tree-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      margin-bottom: 6px
+    }
+
+    .tree-sub {
+      font-size: .83rem;
+      color: var(--ts);
+      margin-bottom: 24px
+    }
+
+    .tree-visual {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0
+    }
+
+    .tree-node {
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: .82rem;
+      font-weight: 600;
+      text-align: center;
+      min-width: 220px;
+      border: 2px solid;
+      transition: all .3s;
+      cursor: pointer;
+      position: relative
+    }
+
+    .tree-node:hover {
+      transform: scale(1.02)
+    }
+
+    .tn-root {
+      background: rgba(124, 141, 255, .08);
+      border-color: rgba(124, 141, 255, .3);
+      color: var(--a)
+    }
+
+    .tn-check {
+      background: rgba(56, 189, 248, .08);
+      border-color: rgba(56, 189, 248, .25);
+      color: var(--a3)
+    }
+
+    .tn-warn {
+      background: rgba(251, 191, 36, .06);
+      border-color: rgba(251, 191, 36, .25);
+      color: var(--y)
+    }
+
+    .tn-high {
+      background: rgba(248, 113, 113, .08);
+      border-color: rgba(248, 113, 113, .25);
+      color: var(--r)
+    }
+
+    .tn-low {
+      background: rgba(52, 211, 153, .08);
+      border-color: rgba(52, 211, 153, .25);
+      color: var(--g)
+    }
+
+    .tn-label {
+      font-size: .68rem;
+      font-weight: 400;
+      color: var(--ts);
+      margin-top: 2px
+    }
+
+    .tree-connector {
+      width: 2px;
+      height: 24px;
+      background: var(--td)
+    }
+
+    .tree-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      width: 100%
+    }
+
+    .tree-branch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0
+    }
+
+    .split-label {
+      font-size: .72rem;
+      color: var(--ts);
+      margin: 6px 0;
+      font-weight: 500
+    }
+
+    .h-line {
+      height: 2px;
+      background: var(--td);
+      width: 100%;
+      margin: 12px 0
+    }
+
+    /* CONFIDENCE INTERVALS */
+    .ci-section {
+      background: var(--s1);
+      border: 1px solid var(--b);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 28px
+    }
+
+    .ci-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 20px
+    }
+
+    .ci-card {
+      background: var(--s2);
+      border-radius: 12px;
+      padding: 16px
+    }
+
+    .ci-name {
+      font-size: .82rem;
+      font-weight: 600;
+      margin-bottom: 10px
+    }
+
+    .ci-bar-wrap {
+      position: relative;
+      height: 20px;
+      background: var(--s3);
+      border-radius: 100px;
+      overflow: visible;
+      margin-bottom: 6px
+    }
+
+    .ci-range {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      border-radius: 100px;
+      opacity: .3
+    }
+
+    .ci-point {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid var(--bg)
+    }
+
+    .ci-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: .72rem;
+      color: var(--ts)
+    }
+
+    /* NATURAL LANGUAGE */
+    .nl-section {
+      background: linear-gradient(135deg, rgba(124, 141, 255, .06), rgba(192, 132, 252, .06));
+      border: 1px solid rgba(124, 141, 255, .18);
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 28px
+    }
+
+    .nl-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px
+    }
+
+    .nl-badge {
+      background: rgba(124, 141, 255, .12);
+      border: 1px solid rgba(124, 141, 255, .25);
+      border-radius: 100px;
+      padding: 4px 12px;
+      font-size: .75rem;
+      font-weight: 600;
+      color: var(--a);
+      display: flex;
+      align-items: center;
+      gap: 5px
+    }
+
+    .nl-badge::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--a);
+      animation: pulse 1.5s infinite
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .3
+      }
+    }
+
+    .nl-text {
+      font-size: .95rem;
+      line-height: 1.85;
+      color: var(--t)
+    }
+
+    .nl-text strong {
+      color: var(--a)
+    }
+
+    .nl-text em {
+      color: var(--r);
+      font-style: normal;
+      font-weight: 600
+    }
+
+    .nl-text mark {
+      background: rgba(124, 141, 255, .12);
+      color: var(--a2);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-style: normal
+    }
+
+    .nl-factors-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px
+    }
+
+    .nlf {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--s1);
+      border: 1px solid var(--b);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: .78rem;
+      font-weight: 500
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: rgba(6, 8, 13, .9);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center
+    }
+
+    .modal-overlay.open {
+      display: flex
+    }
+
+    .modal {
+      background: var(--s1);
+      border: 1px solid var(--b);
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 560px;
+      width: 90%;
+      position: relative;
+      animation: modalIn .3s ease
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: scale(.95)
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1)
+      }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: var(--s2);
+      border: none;
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      color: var(--ts);
+      cursor: pointer;
+      font-size: 1rem;
+      transition: color .2s
+    }
+
+    .modal-close:hover {
+      color: var(--t)
+    }
+
+    .modal h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.2rem;
+      margin-bottom: 8px
+    }
+
+    .modal p {
+      color: var(--ts);
+      font-size: .88rem;
+      line-height: 1.7
+    }
+
+    .modal-score {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 800;
+      text-align: center;
+      margin: 20px 0
+    }
+
+    .modal-bar {
+      height: 8px;
+      background: var(--s3);
+      border-radius: 100px;
+      overflow: hidden;
+      margin-bottom: 20px
+    }
+
+    .modal-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: var(--r);
+      transition: width .8s
+    }
+
+    /* UTILITIES */
+    section.sec {
+      position: relative;
+      z-index: 1;
+      padding: 0 48px
+    }
+
+    h2 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700
+    }
+
+    .sec-gap {
+      margin-bottom: 24px
+    }
+
+    @media(max-width:900px) {
+      .xai-grid {
+        grid-template-columns: 1fr
+      }
+
+      .factor-grid {
+        grid-template-columns: 1fr
+      }
+
+      .ci-grid {
+        grid-template-columns: 1fr
+      }
+
+      .shap-row {
+        grid-template-columns: 120px 1fr 50px
+      }
+
+      nav {
+        padding: 14px 20px
+      }
+
+      .hero,
+      .main,
+      .sec {
+        padding-left: 20px;
+        padding-right: 20px
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg">
+    <div class="bg-dots"></div>
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+  </div>
+
+  <nav class="nc-tool-topbar">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">🧠</div><span class="logo-name">NeuroCare</span>&nbsp;AI
+    </a>
+    <div class="tool-page-badge">🔍 Explainable AI</div>
+    <a href="#" class="tool-back-btn" onclick="window.location.href=NeuroCareAuth.getDashboardUrl();return false;">←
+      Back to Dashboard</a>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="page-tag">🔍 Transparency Engine</div>
+      <h1>Explainable <span class="grad">AI</span><br>— every score, justified.</h1>
+      <p class="hero-sub">NeuroCare AI doesn't just give you a number. Every risk score is broken down into
+        interpretable signals, weighted contributions, confidence intervals, and plain-English explanations.</p>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- CASE SELECTOR -->
+    <div class="case-selector">
+      <button class="case-btn active" onclick="loadCase('high',this)">
+        <div class="cb-avatar" style="background:rgba(248,113,113,.12)">👦</div>
+        <div>
+          <div class="cb-name">Aiden, 2.5 yrs</div>
+          <div class="cb-risk risk-h">● High Risk — 78%</div>
+        </div>
+      </button>
+      <button class="case-btn" onclick="loadCase('medium',this)">
+        <div class="cb-avatar" style="background:rgba(251,191,36,.1)">👧</div>
+        <div>
+          <div class="cb-name">Priya, 3 yrs</div>
+          <div class="cb-risk risk-m">● Medium Risk — 51%</div>
+        </div>
+      </button>
+      <button class="case-btn" onclick="loadCase('low',this)">
+        <div class="cb-avatar" style="background:rgba(52,211,153,.12)">🧒</div>
+        <div>
+          <div class="cb-name">Leo, 2 yrs</div>
+          <div class="cb-risk risk-l">● Low Risk — 19%</div>
+        </div>
+      </button>
+      <button class="case-btn" onclick="loadCase('custom',this)">
+        <div class="cb-avatar" style="background:rgba(124,141,255,.12)">⚙️</div>
+        <div>
+          <div class="cb-name">Custom Case</div>
+          <div class="cb-risk" style="color:var(--a)">● Adjust sliders</div>
+        </div>
+      </button>
+    </div>
+
+    <!-- MAIN XAI GRID -->
+    <div class="xai-grid">
+      <!-- LEFT: SCORE CARD -->
+      <div class="model-card">
+        <div class="mc-title">Risk Assessment</div>
+        <div class="score-ring-wrap">
+          <div class="score-ring">
+            <svg class="ring-svg" viewBox="0 0 120 120">
+              <circle class="ring-track" cx="60" cy="60" r="50" stroke-dasharray="314.16" stroke-dashoffset="0" />
+              <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="50" stroke-dasharray="314.16"
+                stroke-dashoffset="314.16" />
+            </svg>
+            <div class="ring-center">
+              <div class="ring-num" id="ringNum">—</div>
+              <div class="ring-lbl">Risk Score</div>
+            </div>
+          </div>
+          <div class="risk-badge" id="riskBadge">Loading…</div>
+          <div class="conf-block">
+            <div class="conf-row"><span>Model Confidence</span><span id="confPct">—</span></div>
+            <div class="conf-bar">
+              <div class="conf-fill" id="confBar" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="mc-breakdown">
+          <div class="mc-breakdown-title">Score Composition</div>
+          <div class="comp-row"><span class="comp-label">Questionnaire (55%)</span>
+            <div class="comp-bar-wrap">
+              <div class="comp-fill" id="compQ" style="background:var(--a);width:0%"></div>
+            </div><span class="comp-val" id="compQv">—</span>
+          </div>
+          <div class="comp-row"><span class="comp-label">Video Analysis (35%)</span>
+            <div class="comp-bar-wrap">
+              <div class="comp-fill" id="compV" style="background:var(--a2);width:0%"></div>
+            </div><span class="comp-val" id="compVv">—</span>
+          </div>
+          <div class="comp-row"><span class="comp-label">Behavioral Profile (10%)</span>
+            <div class="comp-bar-wrap">
+              <div class="comp-fill" id="compB" style="background:var(--a3);width:0%"></div>
+            </div><span class="comp-val" id="compBv">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: FACTOR CARDS -->
+      <div class="factors-panel">
+        <div class="fp-header">
+          <h3>Feature Importance — What Drove This Score</h3>
+          <div class="fp-tabs">
+            <button class="fp-tab active" onclick="switchFactorView('all',this)">All</button>
+            <button class="fp-tab" onclick="switchFactorView('high',this)">High Impact</button>
+            <button class="fp-tab" onclick="switchFactorView('low',this)">Low Impact</button>
+          </div>
+        </div>
+        <div class="fp-body">
+          <div class="factor-grid" id="factorGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHAP VALUES -->
+    <div class="shap-section sec-gap">
+      <h2 class="shap-title">SHAP-Style Feature Contributions</h2>
+      <p class="shap-sub">Each bar shows how much each feature pushes the risk score higher (red, right) or lower
+        (green, left) relative to baseline.</p>
+      <div class="shap-rows" id="shapRows"></div>
+    </div>
+
+    <!-- NATURAL LANGUAGE EXPLANATION -->
+    <div class="nl-section sec-gap">
+      <div class="nl-header">
+        <div class="nl-badge">AI Explanation</div>
+        <h2 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem">Plain Language Summary</h2>
+      </div>
+      <div class="nl-text" id="nlText"></div>
+      <div class="nl-factors-inline" id="nlFactors"></div>
+    </div>
+
+    <!-- DECISION PATH -->
+    <div class="tree-section sec-gap">
+      <h2 class="tree-title">Decision Logic Path</h2>
+      <p class="tree-sub">Simplified representation of how the model classifies the risk level step by step.</p>
+      <div class="tree-visual" id="treeVisual"></div>
+    </div>
+
+    <!-- CONFIDENCE INTERVALS -->
+    <div class="ci-section sec-gap">
+      <h2 style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:6px">Confidence Intervals</h2>
+      <p style="font-size:.83rem;color:var(--ts);margin-bottom:4px">95% confidence intervals for each feature score.
+        Wider bands = higher uncertainty.</p>
+      <div class="ci-grid" id="ciGrid"></div>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <h3 id="modalTitle">Factor Detail</h3>
+      <div class="modal-score" id="modalScore"></div>
+      <div class="modal-bar">
+        <div class="modal-fill" id="modalBar"></div>
+      </div>
+      <p id="modalDesc"></p>
+    </div>
+  </div>
+
+  <script>
+    const CASES = {
+      high: {
+        score: 78, conf: 84,
+        q: 82, v: 71, b: 68,
+        name: 'Aiden', risk: 'High Risk',
+        factors: [
+          { icon: '👁️', name: 'Eye Contact', val: 22, weight: 'Critical', desc: 'Face attention rate severely below typical range (22% vs 75%+ expected). Sustained gaze aversion during play and feeding sessions.', impact: .35, color: 'rgba(248,113,113,.12)', fillColor: 'var(--r)' },
+          { icon: '📣', name: 'Name Response', val: 18, weight: 'Critical', desc: 'Response to name calling was virtually absent in all observed instances. Strong ASD indicator when combined with other factors.', impact: .32, color: 'rgba(248,113,113,.12)', fillColor: 'var(--r)' },
+          { icon: '🔄', name: 'Repetitive Motion', val: 82, weight: 'High', desc: 'Frequent stereotyped movements detected including hand-flapping and body-rocking patterns at 82% frequency in video.', impact: .28, color: 'rgba(251,191,36,.1)', fillColor: 'var(--y)' },
+          { icon: '🤲', name: 'Pointing Behavior', val: 15, weight: 'High', desc: 'Declarative and imperative pointing nearly absent. Child does not use finger-pointing to direct caregiver attention.', impact: .24, color: 'rgba(248,113,113,.12)', fillColor: 'var(--r)' },
+          { icon: '🎭', name: 'Pretend Play', val: 10, weight: 'Moderate', desc: 'No observed symbolic or pretend play behaviors. Age-appropriate play schemas are absent in video analysis.', impact: .18, color: 'rgba(248,113,113,.12)', fillColor: 'var(--r)' },
+          { icon: '💬', name: 'Language Dev.', val: 20, weight: 'Moderate', desc: 'Significant language delay reported. Fewer than 5 words at 30 months with no two-word combinations observed.', impact: .16, color: 'rgba(124,141,255,.12)', fillColor: 'var(--a)' },
+          { icon: '🤝', name: 'Social Smile', val: 30, weight: 'Low', desc: 'Infrequent social smiling in response to caregiver interaction. Some smiling present during object play.', impact: .10, color: 'rgba(124,141,255,.12)', fillColor: 'var(--a)' },
+          { icon: '👥', name: 'Joint Attention', val: 12, weight: 'Low', desc: 'Shared attention behaviors largely absent. Child rarely follows caregiver gaze or participates in joint referencing.', impact: .09, color: 'rgba(248,113,113,.12)', fillColor: 'var(--r)' }
+        ],
+        shap: [
+          { label: 'Eye Contact', pos: 38, neg: 0 },
+          { label: 'Name Response', pos: 32, neg: 0 },
+          { label: 'Repetitive Motion', pos: 28, neg: 0 },
+          { label: 'Gesture Use', pos: 24, neg: 0 },
+          { label: 'Pretend Play', pos: 18, neg: 0 },
+          { label: 'Language Dev.', pos: 14, neg: 0 },
+          { label: 'Social Smile', pos: 0, neg: 8 },
+          { label: 'Age Factor', pos: 0, neg: 12 }
+        ],
+        nl: `The screening model assigned <strong>Aiden</strong> a risk score of <em>78% (High Risk)</em> primarily driven by severe deficits in <mark>eye contact</mark> and <mark>name response</mark> — two of the highest-weighted features in the ASD screening literature. These two factors alone account for approximately <strong>67%</strong> of the total risk contribution.<br><br>The video analysis detected repetitive motor behaviors at <em>82% frequency</em>, which independently triggers a high-confidence flag. Combined with absent pointing behaviors, no pretend play, and language delay, the multimodal model converges strongly toward a high-risk classification. Model confidence is <strong>84%</strong>.`,
+        nlFactors: ['👁️ Eye contact: 22%', '📣 Name response: 18%', '🔄 Repetitive motion: 82%', '🤲 Pointing: 15%'],
+        tree: 'high', ci: { eye: [10, 22, 34], name: [8, 18, 30], rep: [70, 82, 92], social: [18, 30, 42] }
+      },
+      medium: {
+        score: 51, conf: 76,
+        q: 55, v: 44, b: 52,
+        name: 'Priya', risk: 'Medium Risk',
+        factors: [
+          { icon: '👁️', name: 'Eye Contact', val: 52, weight: 'Moderate', desc: 'Eye contact present but inconsistent. Some sessions show appropriate gaze, others reduced. Borderline pattern.', impact: .22, color: 'rgba(251,191,36,.1)', fillColor: 'var(--y)' },
+          { icon: '📣', name: 'Name Response', val: 58, weight: 'Moderate', desc: 'Inconsistent name response. Responds reliably in quiet settings, inconsistently in stimulating environments.', impact: .18, color: 'rgba(251,191,36,.1)', fillColor: 'var(--y)' },
+          { icon: '🔄', name: 'Repetitive Motion', val: 44, weight: 'Moderate', desc: 'Occasional repetitive behaviors noted but within borderline range. Not persistent or distressing.', impact: .15, color: 'rgba(251,191,36,.1)', fillColor: 'var(--y)' },
+          { icon: '🤲', name: 'Pointing Behavior', val: 48, weight: 'Low', desc: 'Some pointing behaviors observed, primarily imperative (requesting). Declarative pointing inconsistent.', impact: .12, color: 'rgba(124,141,255,.12)', fillColor: 'var(--a)' },
+          { icon: '🎭', name: 'Pretend Play', val: 50, weight: 'Low', desc: 'Emerging pretend play noted. Some symbolic play beginning to appear.', impact: .10, color: 'rgba(124,141,255,.12)', fillColor: 'var(--a)' },
+          { icon: '💬', name: 'Language Dev.', val: 55, weight: 'Low', desc: 'Mild delay noted. Vocabulary developing but below expected range for age.', impact: .09, color: 'rgba(124,141,255,.12)', fillColor: 'var(--a)' },
+          { icon: '🤝', name: 'Social Smile', val: 65, weight: 'Low', desc: 'Social smiling present and appropriate in most interactions.', impact: .06, color: 'rgba(52,211,153,.12)', fillColor: 'var(--g)' },
+          { icon: '👥', name: 'Joint Attention', val: 50, weight: 'Low', desc: 'Joint attention emerging. Follows gaze some of the time.', impact: .05, color: 'rgba(124,141,255,.12)', fillColor: 'var(--a)' }
+        ],
+        shap: [
+          { label: 'Eye Contact', pos: 22, neg: 0 },
+          { label: 'Name Response', pos: 18, neg: 0 },
+          { label: 'Repetitive Motion', pos: 15, neg: 0 },
+          { label: 'Language Dev.', pos: 10, neg: 0 },
+          { label: 'Pretend Play', pos: 0, neg: 8 },
+          { label: 'Social Smile', pos: 0, neg: 12 },
+          { label: 'Joint Attention', pos: 0, neg: 6 },
+          { label: 'Age Factor', pos: 0, neg: 10 }
+        ],
+        nl: `<strong>Priya</strong>'s screening returned a <em>medium risk score of 51%</em>. The model identifies a <mark>borderline pattern</mark> — several features show reduced but not absent behaviors, creating uncertainty in classification.<br><br>Eye contact and name response are present but inconsistent, which is a key differentiator from low-risk profiles. The model's <strong>76% confidence</strong> reflects genuine ambiguity — this profile warrants monitoring but not immediate alarm. Follow-up screening in 3 months is recommended.`,
+        nlFactors: ['👁️ Eye contact: 52%', '📣 Name response: 58%', '🔄 Repetitive: 44%', '🤝 Social smile: 65%'],
+        tree: 'medium', ci: { eye: [40, 52, 64], name: [44, 58, 72], rep: [30, 44, 58], social: [50, 65, 80] }
+      },
+      low: {
+        score: 19, conf: 91,
+        q: 15, v: 22, b: 18,
+        name: 'Leo', risk: 'Low Risk',
+        factors: [
+          { icon: '👁️', name: 'Eye Contact', val: 88, weight: 'Protective', desc: 'Excellent, sustained eye contact throughout all interactions. Well within typical range.', impact: -.28, color: 'rgba(52,211,153,.12)', fillColor: 'var(--g)' },
+          { icon: '📣', name: 'Name Response', val: 92, weight: 'Protective', desc: 'Consistently responds to name in all environments. Reliable orienting response.', impact: -.24, color: 'rgba(52,211,153,.12)', fillColor: 'var(--g)' },
+          { icon: '🔄', name: 'Repetitive Motion', val: 8, weight: 'Protective', desc: 'No repetitive or stereotyped movements observed in video analysis.', impact: -.18, color: 'rgba(52,211,153,.12)', fillColor: 'var(--g)' },
+          { icon: '🤲', name: 'Pointing Behavior', val: 85, weight: 'Protective', desc: 'Rich pointing behavior observed — both declarative and imperative pointing well established.', impact: -.15, color: 'rgba(52,211,153,.12)', fillColor: 'var(--g)' },
+          { icon: '🎭', name: 'Pretend Play', val: 80, weight: 'Positive', desc: 'Active pretend play observed. Uses objects symbolically.', impact: -.12, color: 'rgba(52,211,153,.12)', fillColor: 'var(--g)' },
+          { icon: '💬', name: 'Language Dev.', val: 82, weight: 'Positive', desc: 'Language development on track. Good vocabulary and beginning two-word phrases.', impact: -.10, color: 'rgba(52,211,153,.12)', fillColor: 'var(--g)' },
+          { icon: '🤝', name: 'Social Smile', val: 90, weight: 'Positive', desc: 'Frequent, appropriate social smiling in all interactions.', impact: -.08, color: 'rgba(52,211,153,.12)', fillColor: 'var(--g)' },
+          { icon: '👥', name: 'Joint Attention', val: 86, weight: 'Positive', desc: 'Strong joint attention — consistently follows gaze and participates in shared referencing.', impact: -.07, color: 'rgba(52,211,153,.12)', fillColor: 'var(--g)' }
+        ],
+        shap: [
+          { label: 'Eye Contact', pos: 0, neg: 28 },
+          { label: 'Name Response', pos: 0, neg: 24 },
+          { label: 'Pointing', pos: 0, neg: 18 },
+          { label: 'Social Smile', pos: 0, neg: 15 },
+          { label: 'Joint Attention', pos: 0, neg: 12 },
+          { label: 'Language', pos: 0, neg: 10 },
+          { label: 'Repetitive Motion', pos: 5, neg: 0 },
+          { label: 'Age Factor', pos: 0, neg: 8 }
+        ],
+        nl: `<strong>Leo</strong>'s profile returned a <em>low risk score of 19%</em> with <strong>91% model confidence</strong> — the highest confidence in this demo set. Multiple <mark>protective factors</mark> are strongly present: excellent eye contact (88%), reliable name response (92%), rich pointing behavior, and active pretend play.<br><br>The only minor flag is repetitive motion at 8% — within normal range for this age. The model is confident this is a <strong>typical developmental profile</strong>.`,
+        nlFactors: ['👁️ Eye contact: 88%', '📣 Name response: 92%', '🤲 Pointing: 85%', '🔄 Repetitive: 8%'],
+        tree: 'low', ci: { eye: [76, 88, 97], name: [82, 92, 99], rep: [2, 8, 16], social: [80, 90, 99] }
+      },
+      custom: {
+        score: 45, conf: 78,
+        q: 50, v: 38, b: 44,
+        name: 'Custom', risk: 'Medium Risk',
+        factors: [
+          { icon: '👁️', name: 'Eye Contact', val: 50, weight: 'Moderate', desc: 'Adjust sliders to customize this value.', impact: .18, color: 'rgba(124,141,255,.12)', fillColor: 'var(--a)' },
+          { icon: '📣', name: 'Name Response', val: 55, weight: 'Moderate', desc: 'Adjust sliders to customize.', impact: .15, color: 'rgba(124,141,255,.12)', fillColor: 'var(--a)' },
+          { icon: '🔄', name: 'Repetitive Motion', val: 40, weight: 'Moderate', desc: 'Adjust sliders to customize.', impact: .14, color: 'rgba(251,191,36,.1)', fillColor: 'var(--y)' },
+          { icon: '🤲', name: 'Pointing', val: 50, weight: 'Low', desc: 'Adjust sliders to customize.', impact: .10, color: 'rgba(124,141,255,.12)', fillColor: 'var(--a)' },
+          { icon: '🎭', name: 'Pretend Play', val: 52, weight: 'Low', desc: 'Adjust sliders to customize.', impact: .08, color: 'rgba(124,141,255,.12)', fillColor: 'var(--a)' },
+          { icon: '💬', name: 'Language', val: 55, weight: 'Low', desc: 'Adjust sliders to customize.', impact: .08, color: 'rgba(124,141,255,.12)', fillColor: 'var(--a)' },
+          { icon: '🤝', name: 'Social Smile', val: 60, weight: 'Low', desc: 'Adjust sliders to customize.', impact: .06, color: 'rgba(52,211,153,.12)', fillColor: 'var(--g)' },
+          { icon: '👥', name: 'Joint Attention', val: 52, weight: 'Low', desc: 'Adjust sliders to customize.', impact: .05, color: 'rgba(124,141,255,.12)', fillColor: 'var(--a)' }
+        ],
+        shap: [
+          { label: 'Eye Contact', pos: 18, neg: 0 },
+          { label: 'Name Response', pos: 14, neg: 0 },
+          { label: 'Repetitive Motion', pos: 12, neg: 0 },
+          { label: 'Pointing', pos: 8, neg: 0 },
+          { label: 'Social Smile', pos: 0, neg: 10 },
+          { label: 'Joint Attention', pos: 0, neg: 8 },
+          { label: 'Language', pos: 6, neg: 0 },
+          { label: 'Age Factor', pos: 0, neg: 8 }
+        ],
+        nl: `This is a <em>custom case</em> with default values set to ~50% across most features. Adjust individual factor values by clicking the cards to see how each feature contribution changes the overall risk score in real time.<br><br>The model shows <mark>high sensitivity</mark> to eye contact and name response changes. Try setting these to extremes to see the explanation update.`,
+        nlFactors: ['⚙️ Custom values', '🎛️ Adjust to explore', '📊 See changes live'],
+        tree: 'medium', ci: { eye: [38, 50, 62], name: [42, 55, 68], rep: [28, 40, 54], social: [48, 60, 74] }
+      }
+    };
+
+    let currentCase = 'high';
+
+    function loadCase(key, btn) {
+      document.querySelectorAll('.case-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentCase = key;
+      render(key);
+    }
+
+    function render(key) {
+      const d = CASES[key];
+      // Ring
+      const pct = d.score;
+      const circ = 314.16;
+      const offset = circ - (pct / 100) * circ;
+      const fill = document.getElementById('ringFill');
+      setTimeout(() => { fill.style.strokeDashoffset = offset; }, 50);
+      const color = pct >= 60 ? '#f87171' : pct >= 35 ? '#fbbf24' : '#34d399';
+      fill.style.stroke = color;
+      document.getElementById('ringNum').textContent = pct + '%';
+      document.getElementById('ringNum').style.color = color;
+      const badge = document.getElementById('riskBadge');
+      badge.textContent = d.risk;
+      badge.className = 'risk-badge ' + (pct >= 60 ? 'rb-h' : pct >= 35 ? 'rb-m' : 'rb-l');
+      document.getElementById('confPct').textContent = d.conf + '%';
+      document.getElementById('confBar').style.width = d.conf + '%';
+      setTimeout(() => {
+        document.getElementById('compQ').style.width = d.q + '%';
+        document.getElementById('compV').style.width = d.v + '%';
+        document.getElementById('compB').style.width = d.b + '%';
+      }, 100);
+      document.getElementById('compQv').textContent = d.q + '%';
+      document.getElementById('compVv').textContent = d.v + '%';
+      document.getElementById('compBv').textContent = d.b + '%';
+
+      // Factor grid
+      renderFactors(d.factors, 'all');
+
+      // SHAP
+      const shapMax = 40;
+      const halfW = 200;
+      document.getElementById('shapRows').innerHTML = d.shap.map(s => {
+        const posW = Math.round((s.pos / shapMax) * halfW);
+        const negW = Math.round((s.neg / shapMax) * halfW);
+        const valColor = s.pos > s.neg ? 'var(--r)' : 'var(--g)';
+        const valText = s.pos > 0 ? '+' + s.pos + '%' : '-' + s.neg + '%';
+        return `<div class="shap-row">
+      <div class="shap-label">${s.label}</div>
+      <div class="shap-bar-area">
+        <div class="shap-center"></div>
+        <div class="shap-bar-pos" style="width:${posW}px"></div>
+        <div class="shap-bar-neg" style="width:${negW}px"></div>
+      </div>
+      <div class="shap-val" style="color:${valColor}">${valText}</div>
+    </div>`;
+      }).join('');
+
+      // NL
+      document.getElementById('nlText').innerHTML = d.nl;
+      document.getElementById('nlFactors').innerHTML = d.nlFactors.map(f =>
+        `<span class="nlf">${f}</span>`).join('');
+
+      // Decision tree
+      if (d.tree === 'high') {
+        document.getElementById('treeVisual').innerHTML = `
+      <div class="tree-node tn-root">Social Communication Signals<br><span class="tn-label">Evaluate eye contact + name response</span></div>
+      <div class="tree-connector"></div>
+      <div class="tree-node tn-check">Both below 40%? → YES<br><span class="tn-label">Strong ASD indicator threshold</span></div>
+      <div class="tree-connector"></div>
+      <div class="tree-node tn-warn">Repetitive Behaviors Check<br><span class="tn-label">Video analysis: >60% frequency</span></div>
+      <div class="tree-connector"></div>
+      <div class="tree-node tn-check">Threshold exceeded? → YES<br><span class="tn-label">Adds 0.28 to risk score</span></div>
+      <div class="tree-connector"></div>
+      <div class="tree-node tn-high">🔴 High Risk Classification<br><span class="tn-label">Score: 78% | Confidence: 84%</span></div>`;
+      } else if (d.tree === 'medium') {
+        document.getElementById('treeVisual').innerHTML = `
+      <div class="tree-node tn-root">Social Communication Signals<br><span class="tn-label">Evaluate eye contact + name response</span></div>
+      <div class="tree-connector"></div>
+      <div class="tree-node tn-check">Both in 40–70% range? → YES<br><span class="tn-label">Borderline pattern detected</span></div>
+      <div class="tree-connector"></div>
+      <div class="tree-node tn-warn">Repetitive Behavior Check<br><span class="tn-label">Video: 30–60% frequency range</span></div>
+      <div class="tree-connector"></div>
+      <div class="tree-node tn-check">Borderline range? → YES<br><span class="tn-label">Moderate contribution to score</span></div>
+      <div class="tree-connector"></div>
+      <div class="tree-node tn-warn">🟡 Medium Risk Classification<br><span class="tn-label">Score: 51% | Confidence: 76%</span></div>`;
+      } else {
+        document.getElementById('treeVisual').innerHTML = `
+      <div class="tree-node tn-root">Social Communication Signals<br><span class="tn-label">Evaluate eye contact + name response</span></div>
+      <div class="tree-connector"></div>
+      <div class="tree-node tn-check">Both above 80%? → YES<br><span class="tn-label">Strong protective factor</span></div>
+      <div class="tree-connector"></div>
+      <div class="tree-node tn-warn">Repetitive Behavior Check<br><span class="tn-label">Video: <20% frequency</span></div>
+      <div class="tree-connector"></div>
+      <div class="tree-node tn-check">Below threshold? → YES<br><span class="tn-label">Reduces risk score by -0.18</span></div>
+      <div class="tree-connector"></div>
+      <div class="tree-node tn-low">🟢 Low Risk Classification<br><span class="tn-label">Score: 19% | Confidence: 91%</span></div>`;
+      }
+
+      // CI
+      const ci = d.ci;
+      document.getElementById('ciGrid').innerHTML = [
+        { name: 'Eye Contact', data: ci.eye, color: 'var(--a)' },
+        { name: 'Name Response', data: ci.name, color: 'var(--a2)' },
+        { name: 'Repetitive Motion', data: ci.rep, color: 'var(--r)' },
+        { name: 'Social Score', data: ci.social, color: 'var(--g)' }
+      ].map(item => {
+        const [lo, mid, hi] = item.data;
+        const loPct = lo; const hiPct = hi; const midPct = mid;
+        return `<div class="ci-card">
+      <div class="ci-name">${item.name}</div>
+      <div class="ci-bar-wrap">
+        <div class="ci-range" style="left:${loPct}%;width:${hiPct - loPct}%;background:${item.color}"></div>
+        <div class="ci-point" style="left:${midPct}%;background:${item.color}"></div>
+      </div>
+      <div class="ci-labels"><span>${lo}%</span><span style="color:${item.color};font-weight:700">${mid}%</span><span>${hi}%</span></div>
+    </div>`;
+      }).join('');
+    }
+
+    function renderFactors(factors, filter) {
+      let list = factors;
+      if (filter === 'high') list = factors.filter(f => f.weight === 'Critical' || f.weight === 'High');
+      if (filter === 'low') list = factors.filter(f => f.weight === 'Low' || f.weight === 'Positive' || f.weight === 'Protective');
+      document.getElementById('factorGrid').innerHTML = list.map((f, i) => {
+        const impactColor = f.impact >= 0 ? (f.impact > .2 ? 'var(--r)' : 'var(--y)') : 'var(--g)';
+        const barColor = f.fillColor;
+        const barW = f.impact >= 0 ? f.val : f.val;
+        return `<div class="factor-card" onclick="openModal(${i})">
+      <div class="fc-top">
+        <div class="fc-icon" style="background:${f.color}">${f.icon}</div>
+        <span class="fc-weight">${f.weight}</span>
+      </div>
+      <div class="fc-name">${f.name}</div>
+      <div class="fc-desc">${f.desc.substring(0, 80)}…</div>
+      <div class="fc-meter"><div class="fc-fill" style="width:${barW}%;background:${barColor}"></div></div>
+    </div>`;
+      }).join('');
+    }
+
+    function switchFactorView(filter, btn) {
+      document.querySelectorAll('.fp-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      renderFactors(CASES[currentCase].factors, filter);
+    }
+
+    function openModal(i) {
+      const f = CASES[currentCase].factors[i];
+      document.getElementById('modalTitle').textContent = f.icon + ' ' + f.name;
+      document.getElementById('modalScore').textContent = f.val + '%';
+      document.getElementById('modalScore').style.color = f.fillColor;
+      document.getElementById('modalBar').style.width = f.val + '%';
+      document.getElementById('modalBar').style.background = f.fillColor;
+      document.getElementById('modalDesc').textContent = f.desc;
+      document.getElementById('modalOverlay').classList.add('open');
+    }
+    function closeModal(e) {
+      if (!e || e.target === document.getElementById('modalOverlay') || e.currentTarget.classList.contains('modal-close')) {
+        document.getElementById('modalOverlay').classList.remove('open');
+      }
+    }
+
+    render('high');
+  </script>
+  <footer class="nc-footer" style="padding:24px 32px; margin-top: 40px;">
+    <div class="footer-brand">🧠 NeuroCare AI</div>
+    <div class="footer-links"><a href="index.html">Home</a><a href="privacy.html">Privacy</a><a
+        href="terms.html">Terms</a><a href="contact.html">Contact</a></div>
+    <div class="footer-copy">© 2026 NeuroCare AI. For screening purposes only.</div>
+  </footer>
+  <script src="js/auth.js"></script>
+  <script src="js/navigation.js"></script>
+  <script>
+    if (!NeuroCareAuth.isAuthenticated()) {
+      window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+    }
+  </script>
+</body>
+
+</html>

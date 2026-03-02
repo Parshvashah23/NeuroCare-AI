@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroCare AI — Add Patient</title>
+    <meta name="description" content="Register a new patient for screening.">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .content-area {
+            flex: 1;
+        }
+
+        .page-content {
+            padding: 28px 32px 48px;
+            max-width: 720px;
+        }
+
+        .form-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+        }
+
+        .form-card h3 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-soft);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: var(--surface2);
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 0.88rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--accent);
+        }
+
+        .form-group textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 28px 0;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn-submit {
+            padding: 12px 28px;
+            border: none;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #050d1a;
+            font-weight: 700;
+            font-size: 0.92rem;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(56, 189, 248, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-cancel {
+            padding: 12px 28px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: transparent;
+            color: var(--text-soft);
+            font-weight: 600;
+            font-size: 0.92rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-cancel:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .success-msg {
+            display: none;
+            background: rgba(52, 211, 153, 0.1);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            color: var(--accent3);
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .success-msg.show {
+            display: block;
+        }
+
+        @media(max-width:768px) {
+            .page-content {
+                padding: 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-layout">
+        <aside class="nc-sidebar">
+            <div class="sb-logo">
+                <a href="#" onclick="window.location.href=NeuroCareAuth.getLogoUrl();return false;"
+                    style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;">
+                    <div class="sb-logo-mark">🧠</div>
+                    <div>
+                        <div class="sb-logo-name">NeuroCare AI</div>
+                        <div class="sb-logo-sub">Clinician Portal</div>
+                    </div>
+                </a>
+            </div>
+            <nav class="sb-nav">
+                <div class="sb-section">Overview</div>
+                <a href="index.html" class="sb-item">
+                    <div class="sb-item-icon">🏡</div>Home
+                </a>
+                <a href="clinician-dashboard.html" class="sb-item">
+                    <div class="sb-item-icon">🏠</div>Dashboard
+                </a>
+                <a href="all-patients.html" class="sb-item">
+                    <div class="sb-item-icon">👥</div>All Patients<span class="sb-badge">24</span>
+                </a>
+                <a href="alerts.html" class="sb-item">
+                    <div class="sb-item-icon">⚠️</div>Alerts<span class="sb-badge">7</span>
+                </a>
+                <div class="sb-section">Screening</div>
+                <a href="mchat-screening.html" class="sb-item">
+                    <div class="sb-item-icon">📋</div>M-CHAT Screening
+                </a>
+                <a href="video-analysis.html" class="sb-item">
+                    <div class="sb-item-icon">🎥</div>Video Analysis
+                </a>
+                <a href="explainable-ai.html" class="sb-item">
+                    <div class="sb-item-icon">🔍</div>Explainable AI
+                </a>
+                <div class="sb-section">Analytics</div>
+                <a href="progress-tracking.html" class="sb-item">
+                    <div class="sb-item-icon">📈</div>Progress Tracking
+                </a>
+                <a href="population-stats.html" class="sb-item">
+                    <div class="sb-item-icon">📊</div>Population Stats
+                </a>
+                <a href="reports.html" class="sb-item">
+                    <div class="sb-item-icon">📄</div>Reports
+                </a>
+                <div class="sb-section">Account</div>
+                <a href="schedule.html" class="sb-item">
+                    <div class="sb-item-icon">📅</div>Schedule
+                </a>
+                <a href="settings.html" class="sb-item">
+                    <div class="sb-item-icon">⚙️</div>Settings
+                </a>
+            </nav>
+            <div class="sb-bottom">
+                <div class="sb-user">
+                    <div class="sb-avatar">DR</div>
+                    <div class="sb-user-info">
+                        <div class="sb-user-name">Dr. Rahul Mehta</div>
+                        <div class="sb-user-role">Developmental Pediatrician</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="nc-main-with-sidebar content-area">
+            <div class="nc-topbar">
+                <div>
+                    <h2>Add New Patient</h2>
+                    <div class="tb-sub">Register a patient for screening and monitoring</div>
+                </div>
+            </div>
+
+            <div class="page-content">
+                <div class="success-msg" id="successMsg">✅ Patient registered successfully! Redirecting to All
+                    Patients...</div>
+
+                <div class="form-card">
+                    <h3>👤 Patient Information</h3>
+                    <form id="addPatientForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName">First Name *</label>
+                                <input type="text" id="firstName" required placeholder="e.g. Aiden">
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last Name *</label>
+                                <input type="text" id="lastName" required placeholder="e.g. Kumar">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="dob">Date of Birth *</label>
+                                <input type="date" id="dob" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="gender">Gender *</label>
+                                <select id="gender" required>
+                                    <option value="">Select...</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr class="divider">
+                        <h3>👨‍👩‍👦 Guardian Information</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="guardianName">Guardian Name *</label>
+                                <input type="text" id="guardianName" required placeholder="e.g. Priya Kumar">
+                            </div>
+                            <div class="form-group">
+                                <label for="relationship">Relationship</label>
+                                <select id="relationship">
+                                    <option value="parent">Parent</option>
+                                    <option value="guardian">Legal Guardian</option>
+                                    <option value="caregiver">Caregiver</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="guardianEmail">Email *</label>
+                                <input type="email" id="guardianEmail" required placeholder="e.g. priya@example.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="guardianPhone">Phone</label>
+                                <input type="tel" id="guardianPhone" placeholder="e.g. +91 98765 43210">
+                            </div>
+                        </div>
+
+                        <hr class="divider">
+                        <h3>🩺 Clinical Notes</h3>
+                        <div class="form-row full">
+                            <div class="form-group">
+                                <label for="referralReason">Referral Reason</label>
+                                <select id="referralReason">
+                                    <option value="routine">Routine developmental screening</option>
+                                    <option value="concern">Parent / caregiver concern</option>
+                                    <option value="provider">Provider referral</option>
+                                    <option value="follow-up">Follow-up from previous screening</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row full">
+                            <div class="form-group">
+                                <label for="notes">Additional Notes</label>
+                                <textarea id="notes"
+                                    placeholder="Any observations, concerns, or notes about this patient..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-submit">Register Patient</button>
+                            <button type="button" class="btn-cancel"
+                                onclick="window.location.href='all-patients.html'">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <footer class="nc-footer footer-sidebar">
+                <div class="footer-brand">🧠 NeuroCare AI</div>
+                <div class="footer-links"><a href="index.html">Home</a><a href="privacy.html">Privacy</a><a
+                        href="terms.html">Terms</a><a href="contact.html">Contact</a></div>
+                <div class="footer-copy">© 2026 NeuroCare AI. For screening purposes only.</div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script>
+        if (!NeuroCareAuth.isAuthenticated()) {
+            window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+        }
+        document.getElementById('addPatientForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            // Collect data
+            var patient = {
+                id: 'NCR-' + String(Math.floor(Math.random() * 9000) + 1000).padStart(4, '0'),
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                dob: document.getElementById('dob').value,
+                gender: document.getElementById('gender').value,
+                guardian: document.getElementById('guardianName').value,
+                email: document.getElementById('guardianEmail').value,
+                phone: document.getElementById('guardianPhone').value,
+                referral: document.getElementById('referralReason').value,
+                notes: document.getElementById('notes').value,
+                createdAt: new Date().toISOString()
+            };
+            // Save to localStorage
+            var patients = JSON.parse(localStorage.getItem('nc_patients') || '[]');
+            patients.push(patient);
+            localStorage.setItem('nc_patients', JSON.stringify(patients));
+            // Show success
+            document.getElementById('successMsg').classList.add('show');
+            setTimeout(function () { window.location.href = 'all-patients.html'; }, 1500);
+        });
+    </script>
+</body>
+
+</html>

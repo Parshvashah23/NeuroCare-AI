@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroCare AI — Schedule</title>
+    <meta name="description" content="Manage appointments and follow-up schedules for patients.">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .content-area {
+            flex: 1;
+        }
+
+        .page-content {
+            padding: 28px 32px 48px;
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        /* Upcoming */
+        .schedule-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+        }
+
+        .sc-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sc-header h3 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .sc-body {
+            padding: 0;
+        }
+
+        .appt-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+
+        .appt-item:last-child {
+            border-bottom: none;
+        }
+
+        .appt-item:hover {
+            background: rgba(56, 189, 248, 0.04);
+        }
+
+        .appt-date {
+            min-width: 56px;
+            text-align: center;
+            background: var(--surface2);
+            border-radius: var(--radius-md);
+            padding: 8px;
+        }
+
+        .appt-date .day {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent);
+            line-height: 1;
+        }
+
+        .appt-date .month {
+            font-size: 0.7rem;
+            color: var(--text-soft);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .appt-body {
+            flex: 1;
+        }
+
+        .appt-title {
+            font-weight: 600;
+            font-size: 0.88rem;
+            margin-bottom: 2px;
+        }
+
+        .appt-meta {
+            font-size: 0.78rem;
+            color: var(--text-soft);
+        }
+
+        .appt-type {
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+
+        .appt-type.screening {
+            color: var(--accent);
+            background: rgba(56, 189, 248, 0.1);
+        }
+
+        .appt-type.follow-up {
+            color: var(--warn);
+            background: rgba(251, 191, 36, 0.1);
+        }
+
+        .appt-type.review {
+            color: var(--accent3);
+            background: rgba(52, 211, 153, 0.1);
+        }
+
+        /* New Appointment Form */
+        .new-appt-form {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .new-appt-form label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-soft);
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .new-appt-form input,
+        .new-appt-form select,
+        .new-appt-form textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: var(--surface2);
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 0.88rem;
+            outline: none;
+        }
+
+        .new-appt-form input:focus,
+        .new-appt-form select:focus {
+            border-color: var(--accent);
+        }
+
+        .new-appt-form textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+
+        .btn-schedule {
+            padding: 11px 22px;
+            border: none;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #050d1a;
+            font-weight: 700;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-schedule:hover {
+            transform: translateY(-1px);
+        }
+
+        .success-toast {
+            display: none;
+            background: rgba(52, 211, 153, 0.12);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            border-radius: var(--radius-md);
+            padding: 12px 18px;
+            color: var(--accent3);
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 16px;
+        }
+
+        .success-toast.show {
+            display: block;
+        }
+
+        @media(max-width:1024px) {
+            .schedule-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media(max-width:768px) {
+            .page-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-layout">
+        <aside class="nc-sidebar" id="pageSidebar">
+            <!-- Sidebar will be populated by JS based on role -->
+        </aside>
+
+        <main class="nc-main-with-sidebar content-area">
+            <div class="nc-topbar">
+                <div>
+                    <h2>Schedule</h2>
+                    <div class="tb-sub">Manage appointments and follow-ups</div>
+                </div>
+            </div>
+
+            <div class="page-content">
+                <div class="schedule-grid">
+                    <!-- Upcoming Appointments -->
+                    <div class="schedule-card">
+                        <div class="sc-header">
+                            <h3>📅 Upcoming Appointments</h3>
+                        </div>
+                        <div class="sc-body" id="upcomingList">
+                            <div class="appt-item">
+                                <div class="appt-date">
+                                    <div class="day">01</div>
+                                    <div class="month">Mar</div>
+                                </div>
+                                <div class="appt-body">
+                                    <div class="appt-title">Aiden K. — Follow-up Screening</div>
+                                    <div class="appt-meta">10:30 AM · M-CHAT Re-screening</div>
+                                </div>
+                                <span class="appt-type follow-up">Follow-up</span>
+                            </div>
+                            <div class="appt-item">
+                                <div class="appt-date">
+                                    <div class="day">03</div>
+                                    <div class="month">Mar</div>
+                                </div>
+                                <div class="appt-body">
+                                    <div class="appt-title">Priya M. — Video Analysis Session</div>
+                                    <div class="appt-meta">2:00 PM · In-clinic recording</div>
+                                </div>
+                                <span class="appt-type screening">Screening</span>
+                            </div>
+                            <div class="appt-item">
+                                <div class="appt-date">
+                                    <div class="day">05</div>
+                                    <div class="month">Mar</div>
+                                </div>
+                                <div class="appt-body">
+                                    <div class="appt-title">Sofia K. — Initial Assessment</div>
+                                    <div class="appt-meta">11:00 AM · First M-CHAT screening</div>
+                                </div>
+                                <span class="appt-type screening">Screening</span>
+                            </div>
+                            <div class="appt-item">
+                                <div class="appt-date">
+                                    <div class="day">08</div>
+                                    <div class="month">Mar</div>
+                                </div>
+                                <div class="appt-body">
+                                    <div class="appt-title">Rohan H. — Progress Review</div>
+                                    <div class="appt-meta">3:30 PM · 3-month milestone review</div>
+                                </div>
+                                <span class="appt-type review">Review</span>
+                            </div>
+                            <div class="appt-item">
+                                <div class="appt-date">
+                                    <div class="day">12</div>
+                                    <div class="month">Mar</div>
+                                </div>
+                                <div class="appt-body">
+                                    <div class="appt-title">Zara T. — Re-screening</div>
+                                    <div class="appt-meta">9:00 AM · Risk level reassessment</div>
+                                </div>
+                                <span class="appt-type follow-up">Follow-up</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- New Appointment -->
+                    <div class="schedule-card">
+                        <div class="sc-header">
+                            <h3>➕ Schedule New Appointment</h3>
+                        </div>
+                        <div class="sc-body">
+                            <div class="success-toast" id="apptSuccess">✅ Appointment scheduled successfully!</div>
+                            <form class="new-appt-form" id="newApptForm">
+                                <div>
+                                    <label for="apptPatient">Patient *</label>
+                                    <select id="apptPatient" required>
+                                        <option value="">Select patient...</option>
+                                        <option value="Aiden K.">Aiden K. (NCR-0047)</option>
+                                        <option value="Priya M.">Priya M. (NCR-0042)</option>
+                                        <option value="Leo R.">Leo R. (NCR-0039)</option>
+                                        <option value="Zara T.">Zara T. (NCR-0051)</option>
+                                        <option value="Rohan H.">Rohan H. (NCR-0045)</option>
+                                        <option value="Sofia K.">Sofia K. (NCR-0048)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="apptDate">Date *</label>
+                                    <input type="date" id="apptDate" required>
+                                </div>
+                                <div>
+                                    <label for="apptTime">Time *</label>
+                                    <input type="time" id="apptTime" required>
+                                </div>
+                                <div>
+                                    <label for="apptType">Appointment Type *</label>
+                                    <select id="apptType" required>
+                                        <option value="">Select type...</option>
+                                        <option value="screening">Initial Screening</option>
+                                        <option value="follow-up">Follow-up Screening</option>
+                                        <option value="review">Progress Review</option>
+                                        <option value="video">Video Analysis Session</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="apptNotes">Notes</label>
+                                    <textarea id="apptNotes"
+                                        placeholder="Optional notes about this appointment..."></textarea>
+                                </div>
+                                <button type="submit" class="btn-schedule">Schedule Appointment</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="nc-footer footer-sidebar">
+                <div class="footer-brand">🧠 NeuroCare AI</div>
+                <div class="footer-links"><a href="index.html">Home</a><a href="privacy.html">Privacy</a><a
+                        href="terms.html">Terms</a><a href="contact.html">Contact</a></div>
+                <div class="footer-copy">© 2026 NeuroCare AI. For screening purposes only.</div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script>
+        if (!NeuroCareAuth.isAuthenticated()) {
+            window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+        }
+
+        // Build sidebar based on role
+        var user = NeuroCareAuth.getCurrentUser();
+        var isClinic = user && user.role === 'clinician';
+        var sb = document.getElementById('pageSidebar');
+        sb.innerHTML = '<div class="sb-logo"><a href="#" onclick="window.location.href=NeuroCareAuth.getLogoUrl();return false;" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;"><div class="sb-logo-mark">🧠</div><div><div class="sb-logo-name">NeuroCare AI</div><div class="sb-logo-sub">' + (isClinic ? 'Clinician Portal' : 'Parent Portal') + '</div></div></a></div>' +
+            '<nav class="sb-nav">' +
+            '<div class="sb-section">Overview</div>' +
+            '<a href="index.html" class="sb-item"><div class="sb-item-icon">🏡</div>Home</a>' +
+            '<a href="' + NeuroCareAuth.getDashboardUrl() + '" class="sb-item"><div class="sb-item-icon">🏠</div>Dashboard</a>' +
+            (isClinic ? '<a href="all-patients.html" class="sb-item"><div class="sb-item-icon">👥</div>All Patients</a><a href="alerts.html" class="sb-item"><div class="sb-item-icon">⚠️</div>Alerts</a>' : '') +
+            '<div class="sb-section">Account</div>' +
+            '<a href="schedule.html" class="sb-item active"><div class="sb-item-icon">📅</div>Schedule</a>' +
+            '<a href="reports.html" class="sb-item"><div class="sb-item-icon">📄</div>Reports</a>' +
+            '<a href="settings.html" class="sb-item"><div class="sb-item-icon">⚙️</div>Settings</a>' +
+            '</nav>';
+
+        // Schedule form handler
+        document.getElementById('newApptForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            var appt = {
+                patient: document.getElementById('apptPatient').value,
+                date: document.getElementById('apptDate').value,
+                time: document.getElementById('apptTime').value,
+                type: document.getElementById('apptType').value,
+                notes: document.getElementById('apptNotes').value,
+                createdAt: new Date().toISOString()
+            };
+            var appts = JSON.parse(localStorage.getItem('nc_appointments') || '[]');
+            appts.push(appt);
+            localStorage.setItem('nc_appointments', JSON.stringify(appts));
+
+            // Add to upcoming list
+            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            var d = new Date(appt.date);
+            var typeMap = { screening: 'Screening', 'follow-up': 'Follow-up', review: 'Review', video: 'Screening' };
+            var clsMap = { screening: 'screening', 'follow-up': 'follow-up', review: 'review', video: 'screening' };
+            var html = '<div class="appt-item"><div class="appt-date"><div class="day">' + String(d.getDate()).padStart(2, '0') + '</div><div class="month">' + months[d.getMonth()] + '</div></div><div class="appt-body"><div class="appt-title">' + appt.patient + ' — ' + (typeMap[appt.type] || 'Appointment') + '</div><div class="appt-meta">' + appt.time + '</div></div><span class="appt-type ' + (clsMap[appt.type] || 'screening') + '">' + (typeMap[appt.type] || 'Screening') + '</span></div>';
+            document.getElementById('upcomingList').insertAdjacentHTML('beforeend', html);
+
+            document.getElementById('apptSuccess').classList.add('show');
+            this.reset();
+            setTimeout(function () { document.getElementById('apptSuccess').classList.remove('show'); }, 3000);
+        });
+    </script>
+</body>
+
+</html>

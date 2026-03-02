@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroCare AI — Privacy Policy</title>
+    <meta name="description" content="Privacy Policy and Data Handling for NeuroCare AI.">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-content {
+            padding: 40px 10%;
+            max-width: 900px;
+            margin: 0 auto;
+            flex: 1;
+        }
+
+        .document-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            line-height: 1.7;
+        }
+
+        .document-container h1 {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .document-container .last-updated {
+            font-size: 0.85rem;
+            color: var(--text-soft);
+            margin-bottom: 32px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 24px;
+        }
+
+        .document-container h2 {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 32px 0 16px;
+            color: var(--text);
+        }
+
+        .document-container h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin: 24px 0 12px;
+            color: var(--text);
+        }
+
+        .document-container p {
+            margin-bottom: 16px;
+            color: var(--text-soft);
+            font-size: 0.95rem;
+        }
+
+        .document-container ul {
+            margin-bottom: 16px;
+            padding-left: 24px;
+            color: var(--text-soft);
+            font-size: 0.95rem;
+        }
+
+        .document-container li {
+            margin-bottom: 8px;
+        }
+
+        @media(max-width:768px) {
+            .page-content {
+                padding: 20px;
+            }
+
+            .document-container {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-layout">
+        <aside class="nc-sidebar" id="pageSidebar">
+            <!-- Sidebar populated by JS based on user role or default -->
+        </aside>
+
+        <main class="nc-main-with-sidebar content-area">
+            <div class="nc-topbar">
+                <div>
+                    <h2>Privacy Policy</h2>
+                    <div class="tb-sub">How we handle and protect your data</div>
+                </div>
+            </div>
+
+            <div class="page-content">
+                <div class="document-container">
+                    <h1>Privacy Policy</h1>
+                    <div class="last-updated">Last Updated: February 28, 2026</div>
+
+                    <h2>1. Introduction</h2>
+                    <p>Welcome to NeuroCare AI. We are deeply committed to protecting the privacy and security of your
+                        personal and health-related information. This Privacy Policy explains how we collect, use,
+                        disclose, and safeguard your information when you visit our website or use our application.</p>
+                    <p><strong>Note:</strong> NeuroCare AI is currently a demonstration platform. All data is stored
+                        locally in your browser leveraging localStorage. We do not upload, process, or store your
+                        personal data on external servers.</p>
+
+                    <h2>2. Information We Collect</h2>
+                    <p>While using the NeuroCare AI platform, you may provide the following information which is kept
+                        strictly on your local device:</p>
+                    <ul>
+                        <li><strong>Personal Identification Information:</strong> Name, email address, and demographic
+                            details.</li>
+                        <li><strong>Health and Developmental Data:</strong> M-CHAT screening results, developmental
+                            milestones, clinical notes, and behavioral observations.</li>
+                        <li><strong>Media Files:</strong> Video uploads for behavioral analysis (kept locally).</li>
+                    </ul>
+
+                    <h2>3. How We Use Your Information</h2>
+                    <p>The information stored locally on your device is used to:</p>
+                    <ul>
+                        <li>Generate personalized AI screening reports and risk assessments.</li>
+                        <li>Maintain your child's developmental timeline and progress tracking charts.</li>
+                        <li>Facilitate the scheduling of clinical appointments and follow-ups.</li>
+                        <li>Render the correct, role-based dashboard interface (Parent vs. Clinician).</li>
+                    </ul>
+
+                    <h2>4. Data Storage and Security</h2>
+                    <p>Since this is a client-side web application, your data remains entirely within the confines of
+                        the browser you are using. Clearing your browser's local storage or cache will permanently
+                        delete your personalized NeuroCare AI data.</p>
+                    <p>If this platform transitions to a cloud-based infrastructure in the future, it will be designed
+                        with end-to-end encryption, strict access controls, and full compliance with the Health
+                        Insurance Portability and Accountability Act (HIPAA) and the General Data Protection Regulation
+                        (GDPR).</p>
+
+                    <h2>5. Your Data Rights</h2>
+                    <p>You have full control over the data entered into NeuroCare AI. You can delete your account and
+                        all associated patient records from your settings page, which will immediately clear the
+                        relevant localStorage entries.</p>
+
+                    <h2>6. Contact Us</h2>
+                    <p>If you have questions or comments about this Privacy Policy, please contact us at:</p>
+                    <p>Email: privacy@neurocare-ai.com</p>
+                </div>
+            </div>
+
+            <footer class="nc-footer" style="padding:24px 32px; margin-top:auto;">
+                <div class="footer-brand">🧠 NeuroCare AI</div>
+                <div class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="privacy.html">Privacy</a>
+                    <a href="terms.html">Terms</a>
+                    <a href="contact.html">Contact</a>
+                </div>
+                <div class="footer-copy">© 2026 NeuroCare AI. For screening purposes only.</div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script>
+        // Sidebar logic similar to other pages to keep the UI consistent if a user is logged in
+        var user = NeuroCareAuth.getCurrentUser();
+        var sb = document.getElementById('pageSidebar');
+
+        if (user) {
+            var isClinic = user.role === 'clinician';
+            sb.innerHTML = '<div class="sb-logo"><a href="#" onclick="window.location.href=NeuroCareAuth.getLogoUrl();return false;" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;"><div class="sb-logo-mark">🧠</div><div><div class="sb-logo-name">NeuroCare AI</div><div class="sb-logo-sub">' + (isClinic ? 'Clinician Portal' : 'Parent Portal') + '</div></div></a></div>' +
+                '<nav class="sb-nav">' +
+                '<div class="sb-section">Overview</div>' +
+                '<a href="index.html" class="sb-item"><div class="sb-item-icon">🏡</div>Home</a>' +
+                '<a href="' + NeuroCareAuth.getDashboardUrl() + '" class="sb-item"><div class="sb-item-icon">🏠</div>Dashboard</a>' +
+                (isClinic ? '<a href="all-patients.html" class="sb-item"><div class="sb-item-icon">👥</div>All Patients</a><a href="alerts.html" class="sb-item"><div class="sb-item-icon">⚠️</div>Alerts</a>' : '') +
+                '<div class="sb-section">Account</div>' +
+                '<a href="schedule.html" class="sb-item"><div class="sb-item-icon">📅</div>Schedule</a>' +
+                '<a href="reports.html" class="sb-item"><div class="sb-item-icon">📄</div>Reports</a>' +
+                '<a href="settings.html" class="sb-item"><div class="sb-item-icon">⚙️</div>Settings</a>' +
+                '</nav>';
+        } else {
+            // Default sidebar if not logged in
+            sb.innerHTML = '<div class="sb-logo"><a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;"><div class="sb-logo-mark">🧠</div><div><div class="sb-logo-name">NeuroCare AI</div><div class="sb-logo-sub">Early Detection</div></div></a></div>' +
+                '<nav class="sb-nav">' +
+                '<div class="sb-section">Navigation</div>' +
+                '<a href="index.html" class="sb-item"><div class="sb-item-icon">🏡</div>Home</a>' +
+                '<a href="login.html" class="sb-item"><div class="sb-item-icon">🔑</div>Log In</a>' +
+                '</nav>';
+        }
+    </script>
+</body>
+
+</html>

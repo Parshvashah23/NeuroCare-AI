@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroCare AI — Population Stats</title>
+    <meta name="description"
+        content="Population-level statistics, risk distribution, screening trends, and demographics.">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .content-area {
+            flex: 1;
+        }
+
+        .page-content {
+            padding: 28px 32px 48px;
+        }
+
+        /* KPI Row */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+        }
+
+        .chart-header {
+            padding: 20px 24px 0;
+        }
+
+        .chart-header h3 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .chart-header p {
+            color: var(--text-soft);
+            font-size: 0.78rem;
+        }
+
+        .chart-body {
+            padding: 20px 24px 24px;
+        }
+
+        /* Risk Distribution Bars */
+        .risk-dist {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .risk-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .rb-label {
+            width: 80px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .rb-bar {
+            flex: 1;
+            height: 28px;
+            background: var(--surface2);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .rb-fill {
+            height: 100%;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #050d1a;
+            transition: width 1s ease;
+        }
+
+        .rb-fill.high {
+            background: linear-gradient(90deg, #f87171, #ef4444);
+        }
+
+        .rb-fill.medium {
+            background: linear-gradient(90deg, #fbbf24, #f59e0b);
+        }
+
+        .rb-fill.low {
+            background: linear-gradient(90deg, #34d399, #10b981);
+        }
+
+        .rb-count {
+            width: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        /* Trend Bars */
+        .trend-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            height: 160px;
+            padding-top: 20px;
+        }
+
+        .trend-bar-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .trend-bar {
+            width: 100%;
+            border-radius: 6px 6px 0 0;
+            transition: height 1s ease;
+            min-height: 4px;
+        }
+
+        .trend-bar.blue {
+            background: linear-gradient(180deg, var(--accent), rgba(56, 189, 248, 0.4));
+        }
+
+        .trend-label {
+            font-size: 0.7rem;
+            color: var(--text-soft);
+        }
+
+        .trend-value {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        /* Demographics */
+        .demo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .demo-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 24px;
+        }
+
+        .demo-card h3 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+        }
+
+        .demo-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .demo-item:last-child {
+            border-bottom: none;
+        }
+
+        .demo-item-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .demo-item-bar {
+            flex: 1;
+            max-width: 200px;
+            margin: 0 16px;
+            height: 6px;
+            background: var(--surface2);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .demo-item-fill {
+            height: 100%;
+            border-radius: 100px;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+        }
+
+        .demo-item-val {
+            font-size: 0.85rem;
+            font-weight: 700;
+            min-width: 40px;
+            text-align: right;
+        }
+
+        /* Insights */
+        .insight-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 28px;
+        }
+
+        .insight-card {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.06), rgba(129, 140, 248, 0.06));
+            border: 1px solid rgba(56, 189, 248, 0.15);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+        }
+
+        .ic-icon {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .ic-title {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 0.88rem;
+            margin-bottom: 6px;
+        }
+
+        .ic-text {
+            font-size: 0.8rem;
+            color: var(--text-soft);
+            line-height: 1.55;
+        }
+
+        @media(max-width:1024px) {
+
+            .charts-grid,
+            .demo-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .insight-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media(max-width:768px) {
+            .page-content {
+                padding: 20px;
+            }
+
+            .kpi-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-layout">
+        <aside class="nc-sidebar">
+            <div class="sb-logo">
+                <div class="sb-logo-mark">🧠</div>
+                <div>
+                    <div class="sb-logo-name">NeuroCare AI</div>
+                    <div class="sb-logo-sub">Clinician Portal</div>
+                </div>
+            </div>
+            <nav class="sb-nav">
+                <div class="sb-section">Overview</div>
+                <a href="index.html" class="sb-item">
+                    <div class="sb-item-icon">🏡</div>Home
+                </a>
+                <a href="clinician-dashboard.html" class="sb-item">
+                    <div class="sb-item-icon">🏠</div>Dashboard
+                </a>
+                <a href="all-patients.html" class="sb-item">
+                    <div class="sb-item-icon">👥</div>All Patients<span class="sb-badge">24</span>
+                </a>
+                <a href="alerts.html" class="sb-item">
+                    <div class="sb-item-icon">⚠️</div>Alerts<span class="sb-badge">7</span>
+                </a>
+                <div class="sb-section">Screening</div>
+                <a href="mchat-screening.html" class="sb-item">
+                    <div class="sb-item-icon">📋</div>M-CHAT Screening
+                </a>
+                <a href="video-analysis.html" class="sb-item">
+                    <div class="sb-item-icon">🎥</div>Video Analysis
+                </a>
+                <a href="explainable-ai.html" class="sb-item">
+                    <div class="sb-item-icon">🔍</div>Explainable AI
+                </a>
+                <div class="sb-section">Analytics</div>
+                <a href="progress-tracking.html" class="sb-item">
+                    <div class="sb-item-icon">📈</div>Progress Tracking
+                </a>
+                <a href="population-stats.html" class="sb-item active">
+                    <div class="sb-item-icon">📊</div>Population Stats
+                </a>
+                <a href="reports.html" class="sb-item">
+                    <div class="sb-item-icon">📄</div>Reports
+                </a>
+                <div class="sb-section">Account</div>
+                <a href="settings.html" class="sb-item">
+                    <div class="sb-item-icon">⚙️</div>Settings
+                </a>
+            </nav>
+            <div class="sb-bottom">
+                <div class="sb-user">
+                    <div class="sb-avatar">DR</div>
+                    <div class="sb-user-info">
+                        <div class="sb-user-name">Dr. Rahul Mehta</div>
+                        <div class="sb-user-role">Developmental Pediatrician</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="nc-main-with-sidebar content-area">
+            <div class="nc-topbar">
+                <div>
+                    <h2>Population Statistics</h2>
+                    <div class="tb-sub">Aggregate screening data and demographic analysis</div>
+                </div>
+                <div class="tb-actions">
+                    <button class="btn-secondary btn-sm">📥 Export Report</button>
+                </div>
+            </div>
+
+            <div class="page-content">
+                <div class="kpi-row">
+                    <div class="nc-stat-card">
+                        <div class="stat-value" style="color:var(--accent)">42</div>
+                        <div class="stat-label">Total Screenings (30d)</div>
+                        <div class="stat-trend trend-up">↑ +18% vs last month</div>
+                    </div>
+                    <div class="nc-stat-card">
+                        <div class="stat-value" style="color:var(--text)">24</div>
+                        <div class="stat-label">Unique Patients</div>
+                        <div class="stat-trend trend-up">↑ +3 new</div>
+                    </div>
+                    <div class="nc-stat-card">
+                        <div class="stat-value" style="color:var(--accent2)">81%</div>
+                        <div class="stat-label">Avg Model Confidence</div>
+                        <div class="stat-trend trend-up">↑ +2% improvement</div>
+                    </div>
+                    <div class="nc-stat-card">
+                        <div class="stat-value" style="color:var(--accent3)">1.4</div>
+                        <div class="stat-label">Avg Screenings / Patient</div>
+                        <div class="stat-trend trend-flat">— consistent</div>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <!-- Risk Distribution -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Risk Level Distribution</h3>
+                            <p>Current patient risk breakdown</p>
+                        </div>
+                        <div class="chart-body">
+                            <div class="risk-dist">
+                                <div class="risk-bar-row">
+                                    <div class="rb-label" style="color:var(--danger)">High</div>
+                                    <div class="rb-bar">
+                                        <div class="rb-fill high" style="width:29%">29%</div>
+                                    </div>
+                                    <div class="rb-count">7</div>
+                                </div>
+                                <div class="risk-bar-row">
+                                    <div class="rb-label" style="color:var(--warn)">Medium</div>
+                                    <div class="rb-bar">
+                                        <div class="rb-fill medium" style="width:46%">46%</div>
+                                    </div>
+                                    <div class="rb-count">11</div>
+                                </div>
+                                <div class="risk-bar-row">
+                                    <div class="rb-label" style="color:var(--accent3)">Low</div>
+                                    <div class="rb-bar">
+                                        <div class="rb-fill low" style="width:25%">25%</div>
+                                    </div>
+                                    <div class="rb-count">6</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Screening Trend -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Monthly Screening Volume</h3>
+                            <p>Screenings completed per month</p>
+                        </div>
+                        <div class="chart-body">
+                            <div class="trend-chart">
+                                <div class="trend-bar-wrap">
+                                    <div class="trend-bar blue" style="height:40%"></div>
+                                    <div class="trend-value">18</div>
+                                    <div class="trend-label">Sep</div>
+                                </div>
+                                <div class="trend-bar-wrap">
+                                    <div class="trend-bar blue" style="height:52%"></div>
+                                    <div class="trend-value">24</div>
+                                    <div class="trend-label">Oct</div>
+                                </div>
+                                <div class="trend-bar-wrap">
+                                    <div class="trend-bar blue" style="height:48%"></div>
+                                    <div class="trend-value">22</div>
+                                    <div class="trend-label">Nov</div>
+                                </div>
+                                <div class="trend-bar-wrap">
+                                    <div class="trend-bar blue" style="height:60%"></div>
+                                    <div class="trend-value">28</div>
+                                    <div class="trend-label">Dec</div>
+                                </div>
+                                <div class="trend-bar-wrap">
+                                    <div class="trend-bar blue" style="height:72%"></div>
+                                    <div class="trend-value">34</div>
+                                    <div class="trend-label">Jan</div>
+                                </div>
+                                <div class="trend-bar-wrap">
+                                    <div class="trend-bar blue" style="height:90%"></div>
+                                    <div class="trend-value">42</div>
+                                    <div class="trend-label">Feb</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Demographics -->
+                <div class="demo-grid">
+                    <div class="demo-card">
+                        <h3>Age Distribution</h3>
+                        <div class="demo-item"><span class="demo-item-label">12–18 months</span>
+                            <div class="demo-item-bar">
+                                <div class="demo-item-fill" style="width:15%"></div>
+                            </div><span class="demo-item-val">15%</span>
+                        </div>
+                        <div class="demo-item"><span class="demo-item-label">18–24 months</span>
+                            <div class="demo-item-bar">
+                                <div class="demo-item-fill" style="width:35%"></div>
+                            </div><span class="demo-item-val">35%</span>
+                        </div>
+                        <div class="demo-item"><span class="demo-item-label">24–30 months</span>
+                            <div class="demo-item-bar">
+                                <div class="demo-item-fill" style="width:30%"></div>
+                            </div><span class="demo-item-val">30%</span>
+                        </div>
+                        <div class="demo-item"><span class="demo-item-label">30–36 months</span>
+                            <div class="demo-item-bar">
+                                <div class="demo-item-fill" style="width:20%"></div>
+                            </div><span class="demo-item-val">20%</span>
+                        </div>
+                    </div>
+                    <div class="demo-card">
+                        <h3>Gender Distribution</h3>
+                        <div class="demo-item"><span class="demo-item-label">Male</span>
+                            <div class="demo-item-bar">
+                                <div class="demo-item-fill" style="width:62%"></div>
+                            </div><span class="demo-item-val">62%</span>
+                        </div>
+                        <div class="demo-item"><span class="demo-item-label">Female</span>
+                            <div class="demo-item-bar">
+                                <div class="demo-item-fill" style="width:38%"></div>
+                            </div><span class="demo-item-val">38%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insights -->
+                <div class="insight-cards">
+                    <div class="insight-card">
+                        <div class="ic-icon">📊</div>
+                        <div class="ic-title">Screening Volume Up 18%</div>
+                        <div class="ic-text">February saw the highest screening volume since practice inception, with 42
+                            screenings completed across 24 patients.</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="ic-icon">👦</div>
+                        <div class="ic-title">Higher Male Representation</div>
+                        <div class="ic-text">62% of screened patients are male, consistent with the 4:1 male-to-female
+                            ratio observed in ASD prevalence studies.</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="ic-icon">🎯</div>
+                        <div class="ic-title">Early Intervention Impact</div>
+                        <div class="ic-text">Patients who began ABA therapy within 30 days of high-risk screening showed
+                            an average 12% risk score reduction over 3 months.</div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="nc-footer footer-sidebar">
+                <div class="footer-brand">🧠 NeuroCare AI</div>
+                <div class="footer-links"><a href="index.html">Home</a><a href="privacy.html">Privacy</a><a
+                        href="terms.html">Terms</a><a href="contact.html">Contact</a></div>
+                <div class="footer-copy">© 2026 NeuroCare AI. For screening purposes only.</div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script>
+        if (!NeuroCareAuth.isAuthenticated()) {
+            window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+        }
+    </script>
+</body>
+
+</html>

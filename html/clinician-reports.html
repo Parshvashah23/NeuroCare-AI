@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroCare AI — Patient Reports</title>
+    <meta name="description" content="Detailed screening reports for all patients.">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .content-area {
+            flex: 1;
+        }
+
+        .page-content {
+            padding: 28px 32px 48px;
+        }
+
+        .reports-grid {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 24px;
+        }
+
+        /* Patient List */
+        .patient-list {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            max-height: calc(100vh - 160px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pl-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .pl-header h3 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 0.92rem;
+            margin-bottom: 10px;
+        }
+
+        .pl-search {
+            width: 100%;
+            padding: 9px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: var(--surface2);
+            color: var(--text);
+            font-size: 0.84rem;
+            outline: none;
+        }
+
+        .pl-search:focus {
+            border-color: var(--accent);
+        }
+
+        .pl-body {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .pl-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .pl-item:hover {
+            background: rgba(56, 189, 248, 0.04);
+        }
+
+        .pl-item.active {
+            background: rgba(56, 189, 248, 0.1);
+            border-left: 3px solid var(--accent);
+        }
+
+        .pl-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #050d1a;
+            flex-shrink: 0;
+        }
+
+        .pl-info {
+            flex: 1;
+        }
+
+        .pl-name {
+            font-weight: 600;
+            font-size: 0.88rem;
+        }
+
+        .pl-id {
+            font-size: 0.72rem;
+            color: var(--text-soft);
+        }
+
+        .pl-risk {
+            padding: 3px 8px;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .pl-risk.high {
+            color: var(--danger);
+            background: rgba(248, 113, 113, 0.1);
+        }
+
+        .pl-risk.medium {
+            color: var(--warn);
+            background: rgba(251, 191, 36, 0.1);
+        }
+
+        .pl-risk.low {
+            color: var(--accent3);
+            background: rgba(52, 211, 153, 0.1);
+        }
+
+        /* Report Detail */
+        .report-detail {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+        }
+
+        .rd-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .rd-header h3 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .rd-body {
+            padding: 24px;
+        }
+
+        .report-section {
+            margin-bottom: 28px;
+        }
+
+        .report-section h4 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent);
+        }
+
+        .report-kpi {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .kpi-mini {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            text-align: center;
+        }
+
+        .kpi-mini .val {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .kpi-mini .lbl {
+            font-size: 0.75rem;
+            color: var(--text-soft);
+            margin-top: 4px;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 24px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .tl-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .tl-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 4px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 2px solid var(--surface);
+        }
+
+        .tl-item.high::before {
+            background: var(--danger);
+        }
+
+        .tl-item.medium::before {
+            background: var(--warn);
+        }
+
+        .tl-item.low::before {
+            background: var(--accent3);
+        }
+
+        .tl-date {
+            font-size: 0.75rem;
+            color: var(--text-soft);
+            margin-bottom: 2px;
+        }
+
+        .tl-title {
+            font-weight: 600;
+            font-size: 0.88rem;
+        }
+
+        .tl-desc {
+            font-size: 0.82rem;
+            color: var(--text-soft);
+            line-height: 1.5;
+        }
+
+        .factors-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .factor-item {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 14px;
+        }
+
+        .factor-name {
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .factor-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .factor-fill {
+            height: 100%;
+            border-radius: 100px;
+        }
+
+        .factor-val {
+            font-size: 0.75rem;
+            color: var(--text-soft);
+            margin-top: 4px;
+        }
+
+        .btn-dl {
+            padding: 9px 18px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: transparent;
+            color: var(--text-soft);
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-dl:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        @media(max-width:1024px) {
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .patient-list {
+                max-height: 300px;
+            }
+        }
+
+        @media(max-width:768px) {
+            .page-content {
+                padding: 20px;
+            }
+
+            .report-kpi {
+                grid-template-columns: 1fr;
+            }
+
+            .factors-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-layout">
+        <aside class="nc-sidebar">
+            <div class="sb-logo">
+                <a href="#" onclick="window.location.href=NeuroCareAuth.getLogoUrl();return false;"
+                    style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;">
+                    <div class="sb-logo-mark">🧠</div>
+                    <div>
+                        <div class="sb-logo-name">NeuroCare AI</div>
+                        <div class="sb-logo-sub">Clinician Portal</div>
+                    </div>
+                </a>
+            </div>
+            <nav class="sb-nav">
+                <div class="sb-section">Overview</div>
+                <a href="index.html" class="sb-item">
+                    <div class="sb-item-icon">🏡</div>Home
+                </a>
+                <a href="clinician-dashboard.html" class="sb-item">
+                    <div class="sb-item-icon">🏠</div>Dashboard
+                </a>
+                <a href="all-patients.html" class="sb-item">
+                    <div class="sb-item-icon">👥</div>All Patients
+                </a>
+                <a href="alerts.html" class="sb-item">
+                    <div class="sb-item-icon">⚠️</div>Alerts
+                </a>
+                <div class="sb-section">Screening</div>
+                <a href="mchat-screening.html" class="sb-item">
+                    <div class="sb-item-icon">📋</div>M-CHAT Screening
+                </a>
+                <a href="video-analysis.html" class="sb-item">
+                    <div class="sb-item-icon">🎥</div>Video Analysis
+                </a>
+                <a href="explainable-ai.html" class="sb-item">
+                    <div class="sb-item-icon">🔍</div>Explainable AI
+                </a>
+                <div class="sb-section">Analytics</div>
+                <a href="progress-tracking.html" class="sb-item">
+                    <div class="sb-item-icon">📈</div>Progress Tracking
+                </a>
+                <a href="population-stats.html" class="sb-item">
+                    <div class="sb-item-icon">📊</div>Population Stats
+                </a>
+                <a href="clinician-reports.html" class="sb-item active">
+                    <div class="sb-item-icon">📄</div>Reports
+                </a>
+                <div class="sb-section">Account</div>
+                <a href="schedule.html" class="sb-item">
+                    <div class="sb-item-icon">📅</div>Schedule
+                </a>
+                <a href="settings.html" class="sb-item">
+                    <div class="sb-item-icon">⚙️</div>Settings
+                </a>
+            </nav>
+            <div class="sb-bottom">
+                <div class="sb-user">
+                    <div class="sb-avatar">DR</div>
+                    <div class="sb-user-info">
+                        <div class="sb-user-name">Dr. Rahul Mehta</div>
+                        <div class="sb-user-role">Developmental Pediatrician</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="nc-main-with-sidebar content-area">
+            <div class="nc-topbar">
+                <div>
+                    <h2>Patient Reports</h2>
+                    <div class="tb-sub">View detailed screening and analysis reports</div>
+                </div>
+            </div>
+
+            <div class="page-content">
+                <div class="reports-grid">
+                    <!-- Patient Selector -->
+                    <div class="patient-list">
+                        <div class="pl-header">
+                            <h3>Patients</h3>
+                            <input class="pl-search" type="text" placeholder="🔍 Search patients..." id="reportSearch">
+                        </div>
+                        <div class="pl-body" id="patientListBody">
+                            <div class="pl-item active" onclick="showReport(0, this)">
+                                <div class="pl-avatar">AK</div>
+                                <div class="pl-info">
+                                    <div class="pl-name">Aiden K.</div>
+                                    <div class="pl-id">NCR-0047 · 2.5y M</div>
+                                </div>
+                                <span class="pl-risk high">High</span>
+                            </div>
+                            <div class="pl-item" onclick="showReport(1, this)">
+                                <div class="pl-avatar" style="background:rgba(129,140,248,0.3)">PM</div>
+                                <div class="pl-info">
+                                    <div class="pl-name">Priya M.</div>
+                                    <div class="pl-id">NCR-0042 · 3.0y F</div>
+                                </div>
+                                <span class="pl-risk medium">Medium</span>
+                            </div>
+                            <div class="pl-item" onclick="showReport(2, this)">
+                                <div class="pl-avatar" style="background:rgba(52,211,153,0.3)">LR</div>
+                                <div class="pl-info">
+                                    <div class="pl-name">Leo R.</div>
+                                    <div class="pl-id">NCR-0039 · 1.8y M</div>
+                                </div>
+                                <span class="pl-risk low">Low</span>
+                            </div>
+                            <div class="pl-item" onclick="showReport(3, this)">
+                                <div class="pl-avatar">ZT</div>
+                                <div class="pl-info">
+                                    <div class="pl-name">Zara T.</div>
+                                    <div class="pl-id">NCR-0051 · 2.2y F</div>
+                                </div>
+                                <span class="pl-risk high">High</span>
+                            </div>
+                            <div class="pl-item" onclick="showReport(4, this)">
+                                <div class="pl-avatar" style="background:rgba(251,191,36,0.3)">RH</div>
+                                <div class="pl-info">
+                                    <div class="pl-name">Rohan H.</div>
+                                    <div class="pl-id">NCR-0045 · 2.9y M</div>
+                                </div>
+                                <span class="pl-risk medium">Medium</span>
+                            </div>
+                            <div class="pl-item" onclick="showReport(5, this)">
+                                <div class="pl-avatar" style="background:rgba(248,113,113,0.3)">SK</div>
+                                <div class="pl-info">
+                                    <div class="pl-name">Sofia K.</div>
+                                    <div class="pl-id">NCR-0048 · 1.6y F</div>
+                                </div>
+                                <span class="pl-risk high">High</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Report Detail Panel -->
+                    <div class="report-detail" id="reportPanel">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <footer class="nc-footer footer-sidebar">
+                <div class="footer-brand">🧠 NeuroCare AI</div>
+                <div class="footer-links"><a href="index.html">Home</a><a href="privacy.html">Privacy</a><a
+                        href="terms.html">Terms</a><a href="contact.html">Contact</a></div>
+                <div class="footer-copy">© 2026 NeuroCare AI. For screening purposes only.</div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script>
+        if (!NeuroCareAuth.isAuthenticated()) {
+            window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+        }
+
+        var REPORTS = [
+            {
+                name: 'Aiden K.', id: 'NCR-0047', age: '2.5y M', risk: 'High', riskCls: 'high',
+                score: 78, confidence: 85, screenings: 3,
+                factors: [
+                    { name: 'Eye Contact', val: 82, color: '#f87171' },
+                    { name: 'Name Response', val: 74, color: '#f87171' },
+                    { name: 'Social Smile', val: 45, color: '#fbbf24' },
+                    { name: 'Joint Attention', val: 68, color: '#f87171' }
+                ],
+                timeline: [
+                    { date: 'Feb 14, 2026', title: 'M-CHAT Screening #3', desc: 'Risk score: 78%. Eye contact and name response flagged. Recommended intensive follow-up.', cls: 'high' },
+                    { date: 'Jan 20, 2026', title: 'Video Analysis', desc: 'AI detected reduced eye contact (0.8s avg). Repetitive hand movements noted.', cls: 'high' },
+                    { date: 'Dec 5, 2025', title: 'M-CHAT Screening #2', desc: 'Risk score: 72%. Slight improvement in social engagement.', cls: 'high' },
+                    { date: 'Oct 15, 2025', title: 'Initial Screening', desc: 'First M-CHAT screening. Risk score: 65%. Referred for follow-up.', cls: 'medium' }
+                ]
+            },
+            {
+                name: 'Priya M.', id: 'NCR-0042', age: '3.0y F', risk: 'Medium', riskCls: 'medium',
+                score: 52, confidence: 79, screenings: 2,
+                factors: [
+                    { name: 'Eye Contact', val: 38, color: '#fbbf24' },
+                    { name: 'Name Response', val: 55, color: '#fbbf24' },
+                    { name: 'Social Smile', val: 30, color: '#34d399' },
+                    { name: 'Joint Attention', val: 48, color: '#fbbf24' }
+                ],
+                timeline: [
+                    { date: 'Feb 20, 2026', title: 'M-CHAT Screening #2', desc: 'Risk score: 52%. Name response improved. Continued monitoring recommended.', cls: 'medium' },
+                    { date: 'Nov 10, 2025', title: 'Initial Screening', desc: 'First M-CHAT screening. Risk score: 58%. Scheduled follow-up.', cls: 'medium' }
+                ]
+            },
+            {
+                name: 'Leo R.', id: 'NCR-0039', age: '1.8y M', risk: 'Low', riskCls: 'low',
+                score: 18, confidence: 91, screenings: 3,
+                factors: [
+                    { name: 'Eye Contact', val: 12, color: '#34d399' },
+                    { name: 'Name Response', val: 15, color: '#34d399' },
+                    { name: 'Social Smile', val: 8, color: '#34d399' },
+                    { name: 'Joint Attention', val: 20, color: '#34d399' }
+                ],
+                timeline: [
+                    { date: 'Feb 10, 2026', title: 'M-CHAT Screening #3', desc: 'Risk score: 18%. Consistent low risk across 3 screenings. Routine monitoring.', cls: 'low' },
+                    { date: 'Dec 18, 2025', title: 'M-CHAT Screening #2', desc: 'Risk score: 20%. No concerns flagged.', cls: 'low' },
+                    { date: 'Oct 1, 2025', title: 'Initial Screening', desc: 'First M-CHAT screening. Risk score: 22%. Low risk — monitoring only.', cls: 'low' }
+                ]
+            },
+            {
+                name: 'Zara T.', id: 'NCR-0051', age: '2.2y F', risk: 'High', riskCls: 'high',
+                score: 81, confidence: 87, screenings: 2,
+                factors: [
+                    { name: 'Eye Contact', val: 88, color: '#f87171' },
+                    { name: 'Name Response', val: 76, color: '#f87171' },
+                    { name: 'Social Smile', val: 62, color: '#f87171' },
+                    { name: 'Joint Attention', val: 79, color: '#f87171' }
+                ],
+                timeline: [
+                    { date: 'Feb 25, 2026', title: 'M-CHAT Screening #2', desc: 'Risk score increased to 81% from 65%. Urgent intervention recommended.', cls: 'high' },
+                    { date: 'Jan 5, 2026', title: 'Initial Screening', desc: 'First screening. Risk score: 65%. Scheduled follow-up.', cls: 'medium' }
+                ]
+            },
+            {
+                name: 'Rohan H.', id: 'NCR-0045', age: '2.9y M', risk: 'Medium', riskCls: 'medium',
+                score: 48, confidence: 76, screenings: 2,
+                factors: [
+                    { name: 'Eye Contact', val: 42, color: '#fbbf24' },
+                    { name: 'Name Response', val: 35, color: '#fbbf24' },
+                    { name: 'Social Smile', val: 50, color: '#fbbf24' },
+                    { name: 'Joint Attention', val: 38, color: '#fbbf24' }
+                ],
+                timeline: [
+                    { date: 'Feb 18, 2026', title: 'M-CHAT Screening #2', desc: 'Risk score: 48%. Slight reduction from initial. 30-day follow-up due.', cls: 'medium' },
+                    { date: 'Dec 12, 2025', title: 'Initial Screening', desc: 'First screening. Risk score: 55%. Monitoring protocol initiated.', cls: 'medium' }
+                ]
+            },
+            {
+                name: 'Sofia K.', id: 'NCR-0048', age: '1.6y F', risk: 'High', riskCls: 'high',
+                score: 72, confidence: 82, screenings: 1,
+                factors: [
+                    { name: 'Eye Contact', val: 70, color: '#f87171' },
+                    { name: 'Name Response', val: 65, color: '#f87171' },
+                    { name: 'Social Smile', val: 58, color: '#fbbf24' },
+                    { name: 'Joint Attention', val: 72, color: '#f87171' }
+                ],
+                timeline: [
+                    { date: 'Feb 22, 2026', title: 'Initial Screening', desc: 'First M-CHAT screening. Risk score: 72%. High risk flagged. Follow-up overdue.', cls: 'high' }
+                ]
+            }
+        ];
+
+        function showReport(idx, el) {
+            document.querySelectorAll('.pl-item').forEach(function (i) { i.classList.remove('active'); });
+            if (el) el.classList.add('active');
+            var r = REPORTS[idx];
+            var panel = document.getElementById('reportPanel');
+            var html = '<div class="rd-header"><h3>' + r.name + ' — Report</h3><button class="btn-dl" onclick="alert(\'Generating PDF...\')">📥 Download PDF</button></div>';
+            html += '<div class="rd-body">';
+            // KPIs
+            html += '<div class="report-kpi"><div class="kpi-mini"><div class="val" style="color:var(--' + (r.riskCls === 'high' ? 'danger' : r.riskCls === 'medium' ? 'warn' : 'accent3') + ')">' + r.score + '%</div><div class="lbl">Risk Score</div></div>';
+            html += '<div class="kpi-mini"><div class="val" style="color:var(--accent2)">' + r.confidence + '%</div><div class="lbl">Model Confidence</div></div>';
+            html += '<div class="kpi-mini"><div class="val" style="color:var(--accent)">' + r.screenings + '</div><div class="lbl">Total Screenings</div></div></div>';
+            // Factors
+            html += '<div class="report-section"><h4>🔬 Risk Factor Breakdown</h4><div class="factors-grid">';
+            r.factors.forEach(function (f) {
+                html += '<div class="factor-item"><div class="factor-name">' + f.name + '</div><div class="factor-bar"><div class="factor-fill" style="width:' + f.val + '%;background:' + f.color + '"></div></div><div class="factor-val">' + f.val + '% concern level</div></div>';
+            });
+            html += '</div></div>';
+            // Timeline
+            html += '<div class="report-section"><h4>📋 Screening History</h4><div class="timeline">';
+            r.timeline.forEach(function (t) {
+                html += '<div class="tl-item ' + t.cls + '"><div class="tl-date">' + t.date + '</div><div class="tl-title">' + t.title + '</div><div class="tl-desc">' + t.desc + '</div></div>';
+            });
+            html += '</div></div>';
+            html += '</div>';
+            panel.innerHTML = html;
+        }
+
+        // Search
+        document.getElementById('reportSearch').addEventListener('input', function () {
+            var q = this.value.toLowerCase();
+            document.querySelectorAll('.pl-item').forEach(function (item) {
+                var name = item.querySelector('.pl-name').textContent.toLowerCase();
+                var id = item.querySelector('.pl-id').textContent.toLowerCase();
+                item.style.display = (name.includes(q) || id.includes(q)) ? '' : 'none';
+            });
+        });
+
+        // Show first report by default
+        showReport(0, null);
+    </script>
+</body>
+
+</html>

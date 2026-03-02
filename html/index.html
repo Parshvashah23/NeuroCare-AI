@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NeuroCare AI — Early Autism Screening Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    :root {
+      --bg: #050d1a;
+      --surface: #0a1628;
+      --surface2: #0f1f35;
+      --border: rgba(100, 180, 255, 0.12);
+      --accent: #38bdf8;
+      --accent2: #818cf8;
+      --accent3: #34d399;
+      --danger: #f87171;
+      --warn: #fbbf24;
+      --text: #e2eaf5;
+      --muted: #7a9abf;
+      --glow: rgba(56, 189, 248, 0.18);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── BACKGROUND ── */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-image:
+        linear-gradient(rgba(56, 189, 248, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56, 189, 248, 0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+
+    .bg-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .orb1 {
+      width: 600px;
+      height: 600px;
+      background: rgba(56, 189, 248, 0.07);
+      top: -200px;
+      right: -100px;
+    }
+
+    .orb2 {
+      width: 400px;
+      height: 400px;
+      background: rgba(129, 140, 248, 0.07);
+      bottom: 10%;
+      left: -100px;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 48px;
+      background: rgba(5, 13, 26, 0.75);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.35rem;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .logo span {
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .nav-cta {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #050d1a;
+      font-weight: 700;
+      font-size: 0.88rem;
+      padding: 9px 22px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .nav-cta:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    /* ── SECTIONS ── */
+    section {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--accent);
+      margin-bottom: 32px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.3;
+      }
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      max-width: 900px;
+      animation: fadeUp 0.7s 0.1s ease both;
+    }
+
+    h1 .gradient {
+      background: linear-gradient(135deg, var(--accent), var(--accent2) 50%, var(--accent3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 580px;
+      line-height: 1.75;
+      margin: 24px 0 48px;
+      animation: fadeUp 0.7s 0.2s ease both;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeUp 0.7s 0.3s ease both;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #050d1a;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 14px 32px;
+      border-radius: 10px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 24px rgba(56, 189, 248, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(56, 189, 248, 0.4);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 14px 32px;
+      border-radius: 10px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.07);
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 40px;
+      margin-top: 72px;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: fadeUp 0.7s 0.4s ease both;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .stat-label {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ── HOW IT WORKS ── */
+    .section-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .section-tag {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .section-sub {
+      color: var(--muted);
+      font-size: 1.05rem;
+      margin-top: 12px;
+      max-width: 520px;
+      margin-inline: auto;
+      line-height: 1.7;
+    }
+
+    .hiw {
+      padding: 100px 48px;
+    }
+
+    .hiw-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .step-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 28px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+
+    .step-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+    }
+
+    .step-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.05), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .step-card:hover::before {
+      opacity: 1;
+    }
+
+    .step-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 3rem;
+      font-weight: 800;
+      color: rgba(56, 189, 248, 0.12);
+      line-height: 1;
+      margin-bottom: 20px;
+    }
+
+    .step-icon {
+      font-size: 2rem;
+      margin-bottom: 16px;
+    }
+
+    .step-card h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .step-card p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.65;
+    }
+
+    /* ── SCREENING TOOL ── */
+    .screening {
+      padding: 80px 48px;
+    }
+
+    .tool-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
+    }
+
+    .tool-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 16px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-pane {
+      display: none;
+      padding: 40px;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    /* Questionnaire */
+    .q-progress-bar {
+      background: var(--surface2);
+      border-radius: 100px;
+      height: 6px;
+      margin-bottom: 32px;
+      overflow: hidden;
+    }
+
+    .q-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 100px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    .q-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .question {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 28px;
+      line-height: 1.4;
+    }
+
+    .q-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .q-opt {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      cursor: pointer;
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: var(--text);
+      background: var(--surface2);
+      transition: all 0.2s;
+      text-align: left;
+    }
+
+    .q-opt:hover {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    .q-opt.selected {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--accent);
+    }
+
+    .q-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 32px;
+    }
+
+    .q-nav button {
+      padding: 10px 24px;
+      border-radius: 9px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .q-back {
+      background: var(--surface2);
+      color: var(--muted);
+    }
+
+    .q-next {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #050d1a;
+    }
+
+    .q-next:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* Video Upload */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 16px;
+      padding: 60px 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: var(--surface2);
+    }
+
+    .upload-zone:hover,
+    .upload-zone.drag {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.06);
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+
+    .upload-zone h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    .upload-zone p {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .upload-tips {
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .tip {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .tip-icon {
+      font-size: 1.3rem;
+      margin-bottom: 6px;
+    }
+
+    .simulate-btn {
+      margin-top: 32px;
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #050d1a;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .simulate-btn:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    /* Results */
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .risk-card {
+      grid-column: span 2;
+      background: var(--surface2);
+      border-radius: 16px;
+      padding: 32px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .risk-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      position: relative;
+    }
+
+    .risk-circle::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 3px solid transparent;
+    }
+
+    .risk-high {
+      background: rgba(248, 113, 113, 0.1);
+      border: 3px solid var(--danger);
+    }
+
+    .risk-medium {
+      background: rgba(251, 191, 36, 0.1);
+      border: 3px solid var(--warn);
+    }
+
+    .risk-low {
+      background: rgba(52, 211, 153, 0.1);
+      border: 3px solid var(--accent3);
+    }
+
+    .risk-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    .risk-val {
+      font-size: 1.3rem;
+      font-weight: 800;
+    }
+
+    .risk-info h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .risk-info p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .confidence-bar-wrap {
+      margin-top: 14px;
+    }
+
+    .conf-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .conf-bar {
+      height: 6px;
+      background: var(--surface);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+
+    .conf-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: linear-gradient(90deg, var(--accent3), var(--accent));
+      width: 82%;
+    }
+
+    .factor-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+    }
+
+    .factor-card h4 {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .factor-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+
+    .factor-row:last-child {
+      border: none;
+    }
+
+    .factor-row span:last-child {
+      font-weight: 600;
+    }
+
+    .flag-red {
+      color: var(--danger);
+    }
+
+    .flag-yellow {
+      color: var(--warn);
+    }
+
+    .flag-green {
+      color: var(--accent3);
+    }
+
+    .ai-summary {
+      grid-column: span 2;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.06), rgba(129, 140, 248, 0.06));
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 14px;
+      padding: 24px;
+    }
+
+    .ai-summary h4 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+    }
+
+    .ai-summary p {
+      color: var(--text);
+      font-size: 0.92rem;
+      line-height: 1.75;
+    }
+
+    .next-steps {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .next-step {
+      background: rgba(52, 211, 153, 0.12);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      color: var(--accent3);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 100px;
+    }
+
+    /* ── DEMO CASES ── */
+    .demo {
+      padding: 80px 48px;
+    }
+
+    .demo-cases {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .demo-case {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .demo-case:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+    }
+
+    .case-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 16px;
+    }
+
+    .case-avatar.blue {
+      background: rgba(56, 189, 248, 0.12);
+    }
+
+    .case-avatar.purple {
+      background: rgba(129, 140, 248, 0.12);
+    }
+
+    .case-avatar.green {
+      background: rgba(52, 211, 153, 0.12);
+    }
+
+    .case-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .case-age {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+    }
+
+    .case-risk {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 100px;
+    }
+
+    .case-risk.high {
+      background: rgba(248, 113, 113, 0.12);
+      color: var(--danger);
+    }
+
+    .case-risk.medium {
+      background: rgba(251, 191, 36, 0.12);
+      color: var(--warn);
+    }
+
+    .case-risk.low {
+      background: rgba(52, 211, 153, 0.12);
+      color: var(--accent3);
+    }
+
+    .case-risk::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .case-score {
+      margin-top: 16px;
+    }
+
+    .score-bar {
+      height: 5px;
+      background: var(--surface2);
+      border-radius: 100px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .score-fill {
+      height: 100%;
+      border-radius: 100px;
+    }
+
+    .score-fill.red {
+      background: var(--danger);
+    }
+
+    .score-fill.yellow {
+      background: var(--warn);
+    }
+
+    .score-fill.green {
+      background: var(--accent3);
+    }
+
+    .score-text {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    /* ── FEATURES ── */
+    .features {
+      padding: 100px 48px;
+      background: linear-gradient(180deg, transparent, rgba(56, 189, 248, 0.03), transparent);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .feat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      transition: all 0.3s;
+    }
+
+    .feat:hover {
+      border-color: var(--accent);
+    }
+
+    .feat-icon {
+      font-size: 2rem;
+      margin-bottom: 16px;
+    }
+
+    .feat h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin-bottom: 10px;
+    }
+
+    .feat p {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.65;
+    }
+
+    .feat-tag {
+      margin-top: 16px;
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--accent2);
+      background: rgba(129, 140, 248, 0.1);
+      border-radius: 6px;
+      padding: 3px 10px;
+    }
+
+    /* ── CTA BANNER ── */
+    .cta-section {
+      padding: 100px 48px;
+      text-align: center;
+    }
+
+    .cta-box {
+      max-width: 720px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(129, 140, 248, 0.08));
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 24px;
+      padding: 64px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-box::before {
+      content: '';
+      position: absolute;
+      top: -40%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 400px;
+      height: 300px;
+      background: radial-gradient(ellipse, rgba(56, 189, 248, 0.12), transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-box h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .cta-box p {
+      color: var(--muted);
+      margin: 16px 0 36px;
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    .cta-actions {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    < !-- ── FOOTER ── --><footer class="nc-footer"><div class="footer-brand">🧠 NeuroCare AI</div><div class="footer-links" style="display:flex;gap:20px;"><a href="index.html" style="color:var(--muted);text-decoration:none;">Home</a><a href="privacy.html" style="color:var(--muted);text-decoration:none;">Privacy</a><a href="terms.html" style="color:var(--muted);text-decoration:none;">Terms</a><a href="contact.html" style="color:var(--muted);text-decoration:none;">Contact</a></div><div class="footer-disclaimer">© 2026 NeuroCare AI. For educational use. <strong>Not medical advice.</strong></div></footer>
+
+    /* ── PROCESSING ANIMATION ── */
+    .processing {
+      text-align: center;
+      padding: 60px 20px;
+      display: none;
+    }
+
+    .processing.active {
+      display: block;
+    }
+
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      animation: spin 0.9s linear infinite;
+      margin: 0 auto 24px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .processing h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    .processing p {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .proc-steps {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 300px;
+      margin-inline: auto;
+    }
+
+    .proc-step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .proc-step .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .proc-step.done .dot {
+      background: var(--accent3);
+    }
+
+    .proc-step.active .dot {
+      background: var(--accent);
+      animation: pulse 0.8s infinite;
+    }
+
+    /* ── AUTH MODAL ── */
+    .auth-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 13, 26, 0.92);
+      backdrop-filter: blur(18px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+    }
+
+    .auth-overlay.active {
+      display: flex;
+    }
+
+    .auth-modal {
+      width: 100%;
+      max-width: 420px;
+      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.16), transparent 55%), var(--surface);
+      border-radius: 24px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      box-shadow: 0 24px 80px rgba(15, 23, 42, 0.9);
+      padding: 28px 26px 26px;
+      position: relative;
+    }
+
+    .auth-close {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .auth-tabs {
+      display: inline-flex;
+      padding: 3px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      margin-bottom: 20px;
+    }
+
+    .auth-tab {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 7px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .auth-tab.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #050d1a;
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.65);
+    }
+
+    .auth-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .auth-sub {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .auth-field label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .auth-input {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.95);
+      padding: 11px 12px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+
+    .auth-input:focus {
+      border-color: var(--accent);
+      background: #020617;
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.5);
+    }
+
+    .auth-primary-btn {
+      margin-top: 4px;
+      width: 100%;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #050d1a;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 12px 16px;
+      cursor: pointer;
+      box-shadow: 0 12px 35px rgba(56, 189, 248, 0.45);
+      transition: transform 0.18s, box-shadow 0.18s, opacity 0.18s;
+    }
+
+    .auth-primary-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 45px rgba(56, 189, 248, 0.55);
+    }
+
+    .auth-error {
+      min-height: 18px;
+      font-size: 0.8rem;
+      color: var(--danger);
+      margin-bottom: 4px;
+    }
+
+    .auth-footer-text {
+      margin-top: 4px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .auth-footer-text strong {
+      color: var(--accent2);
+    }
+
+    .auth-note {
+      margin-top: 10px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav {
+        padding: 14px 20px;
+      }
+
+      nav ul {
+        display: none;
+      }
+
+      .hiw,
+      .screening,
+      .demo,
+      .features,
+      .cta-section {
+        padding: 60px 20px;
+      }
+
+      footer {
+        padding: 30px 20px;
+        flex-direction: column;
+      }
+
+      .q-options {
+        grid-template-columns: 1fr;
+      }
+
+      .results-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .risk-card {
+        grid-column: span 1;
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .ai-summary {
+        grid-column: span 1;
+      }
+
+      .upload-tips {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="bg-grid"></div>
+  <div class="bg-orb orb1"></div>
+  <div class="bg-orb orb2"></div>
+
+  <!-- NAV -->
+  <nav class="nc-nav">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">🧠</div>
+      <span class="logo-name">NeuroCare</span>&nbsp;AI
+    </a>
+    <div class="nav-links">
+      <a href="#how-it-works" class="nav-link">How It Works</a>
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#demo" class="nav-link">Demo Cases</a>
+      <a href="#" class="nav-link" data-requires-auth="true"
+        onclick="window.location.href=NeuroCareAuth.getDashboardUrl();return false;">Dashboard</a>
+    </div>
+    <button class="nav-hamburger" aria-label="Menu" aria-expanded="false">☰</button>
+    <button class="nav-cta" type="button" id="navAuthBtn" onclick="window.location.href='signup.html'">Sign up</button>
+    <div class="nav-user" id="navUserArea" style="display:none;">
+      <div class="nav-user-avatar"></div>
+      <span class="nav-user-name"></span>
+      <div class="nav-user-dropdown" id="navUserDropdown">
+        <a href="#" onclick="window.location.href=NeuroCareAuth.getDashboardUrl();return false;">🏠 Dashboard</a>
+        <a href="reports.html">📊 Reports</a>
+        <a href="settings.html">⚙️ Settings</a>
+        <button class="logout-btn">🚪 Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- AUTH OVERLAY -->
+  <div class="auth-overlay" id="authOverlay">
+    <div class="auth-modal">
+      <button class="auth-close" type="button" id="authCloseBtn">✕</button>
+      <div class="auth-tabs">
+        <button class="auth-tab active" type="button" data-mode="signin" id="tabSignIn">Sign in</button>
+        <button class="auth-tab" type="button" data-mode="signup" id="tabSignUp">Sign up</button>
+      </div>
+      <h2 class="auth-title" id="authTitle">Welcome back</h2>
+      <p class="auth-sub" id="authSub">Sign in to access screening and interactive features.</p>
+      <form class="auth-form" id="authForm">
+        <div class="auth-field" id="nameField" style="display:none;">
+          <label for="authName">Full Name</label>
+          <input class="auth-input" type="text" id="authName" autocomplete="name" placeholder="e.g. Aiden's Parent">
+        </div>
+        <div class="auth-field">
+          <label for="authEmail">Email</label>
+          <input class="auth-input" type="email" id="authEmail" autocomplete="email" placeholder="you@example.com"
+            required>
+        </div>
+        <div class="auth-field">
+          <label for="authPassword">Password</label>
+          <input class="auth-input" type="password" id="authPassword" autocomplete="current-password"
+            placeholder="Minimum 6 characters" required>
+        </div>
+        <div class="auth-error" id="authError"></div>
+        <button class="auth-primary-btn" type="submit" id="authSubmitBtn">Continue</button>
+      </form>
+      <p class="auth-footer-text">
+        Demo only — accounts are stored locally in your browser using <strong>localStorage</strong>. No real
+        authentication or data upload occurs.
+      </p>
+      <p class="auth-note">After signing in once on this device, you’ll be able to open Screening and other features
+        directly.</p>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">🌐 AI-Powered Early Detection Platform</div>
+    <h1>Early autism<br><span class="gradient">detection</span> that<br>doesn't wait.</h1>
+    <p class="hero-sub">NeuroCare AI helps parents and clinicians identify early signs of autism through guided
+      questionnaires and video analysis — reducing diagnosis delays from years to minutes.</p>
+    <div class="hero-actions">
+      <a href="neurocare-screening.html" class="btn-primary" data-requires-auth="true">Start Free Screening</a>
+      <a href="#demo" class="btn-secondary">View Demo Cases</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">2–4 yrs</div>
+        <div class="stat-label">Average diagnosis delay</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">1 in 36</div>
+        <div class="stat-label">Children affected by autism</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">82%</div>
+        <div class="stat-label">Accuracy on demo dataset</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">&lt; 5 min</div>
+        <div class="stat-label">Time to get risk score</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="hiw" id="how-it-works">
+    <div class="section-header">
+      <div class="section-tag">The Process</div>
+      <h2>Three steps to early insight</h2>
+      <p class="section-sub">No hospital visit required. Start from home with just a phone camera and 5 minutes of your
+        time.</p>
+    </div>
+    <div class="hiw-steps">
+      <div class="step-card">
+        <div class="step-num">01</div>
+        <div class="step-icon">📋</div>
+        <h3>Behavioral Questionnaire</h3>
+        <p>Answer 10 simple yes/no questions about your child's behavior, communication, and social patterns. Based on
+          M-CHAT screening principles.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">02</div>
+        <div class="step-icon">🎥</div>
+        <h3>Video Analysis</h3>
+        <p>Upload a short 30-second video of your child. Our AI analyzes facial attention, eye contact patterns, and
+          movement characteristics.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">03</div>
+        <div class="step-icon">📊</div>
+        <h3>AI Risk Report</h3>
+        <p>Receive an instant, explainable risk score with detailed breakdown and personalized next-step recommendations
+          for parents and clinicians.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">04</div>
+        <div class="step-icon">👩‍⚕️</div>
+        <h3>Clinician Review</h3>
+        <p>Share your AI-generated report directly with your pediatrician. Full clinical dashboard available for
+          healthcare providers.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEMO CASES -->
+  <section class="demo" id="demo">
+    <div class="section-header">
+      <div class="section-tag">Example Cases</div>
+      <h2>See how it works in practice</h2>
+      <p class="section-sub">Explore three example children to understand how NeuroCare AI interprets different risk
+        profiles.</p>
+    </div>
+    <div class="demo-cases">
+      <div class="demo-case" onclick="loadDemoCase('high')">
+        <div class="case-avatar blue">👦</div>
+        <div class="case-name">Aiden, 2.5 yrs</div>
+        <div class="case-age">Male · Parent-reported screening</div>
+        <span class="case-risk high">High Risk</span>
+        <div class="case-score">
+          <div class="score-text"><span>Overall risk score</span><span>78%</span></div>
+          <div class="score-bar">
+            <div class="score-fill red" style="width:78%"></div>
+          </div>
+          <div class="score-text" style="margin-top:6px;"><span>Model confidence</span><span>84%</span></div>
+          <div class="score-bar">
+            <div class="score-fill red" style="width:84%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-case" onclick="loadDemoCase('medium')">
+        <div class="case-avatar purple">👧</div>
+        <div class="case-name">Priya, 3 yrs</div>
+        <div class="case-age">Female · Clinician-referred screening</div>
+        <span class="case-risk medium">Medium Risk</span>
+        <div class="case-score">
+          <div class="score-text"><span>Overall risk score</span><span>51%</span></div>
+          <div class="score-bar">
+            <div class="score-fill yellow" style="width:51%"></div>
+          </div>
+          <div class="score-text" style="margin-top:6px;"><span>Model confidence</span><span>76%</span></div>
+          <div class="score-bar">
+            <div class="score-fill yellow" style="width:76%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-case" onclick="loadDemoCase('low')">
+        <div class="case-avatar green">🧒</div>
+        <div class="case-name">Leo, 2 yrs</div>
+        <div class="case-age">Male · Routine screening</div>
+        <span class="case-risk low">Low Risk</span>
+        <div class="case-score">
+          <div class="score-text"><span>Overall risk score</span><span>18%</span></div>
+          <div class="score-bar">
+            <div class="score-fill green" style="width:18%"></div>
+          </div>
+          <div class="score-text" style="margin-top:6px;"><span>Model confidence</span><span>91%</span></div>
+          <div class="score-bar">
+            <div class="score-fill green" style="width:91%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="section-header">
+      <div class="section-tag">Why NeuroCare AI</div>
+      <h2>Built for clarity and trust</h2>
+      <p class="section-sub">Every feature is designed around one goal: getting the right child the right support,
+        sooner.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat">
+        <div class="feat-icon">🔍</div>
+        <h3>Explainable AI</h3>
+        <p>Every result includes a full breakdown of contributing signals. Parents and clinicians always know exactly
+          why a risk score was assigned.</p>
+        <span class="feat-tag">Transparency</span>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🎥</div>
+        <h3>Video Behavioral Analysis</h3>
+        <p>AI-powered face detection and attention tracking extracts meaningful behavioral signals from short home
+          videos without specialist equipment.</p>
+        <span class="feat-tag">Computer Vision</span>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">📋</div>
+        <h3>M-CHAT Inspired Screening</h3>
+        <p>Questionnaire built on evidence-based M-CHAT screening principles, validated across thousands of clinical
+          cases worldwide.</p>
+        <span class="feat-tag">Evidence-Based</span>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🏥</div>
+        <h3>Clinician Dashboard</h3>
+        <p>Doctors receive clean, structured AI summaries with flagged indicators and decision-support insights for
+          faster triage.</p>
+        <span class="feat-tag">Clinical Grade</span>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">📈</div>
+        <h3>Progress Tracking</h3>
+        <p>Longitudinal monitoring tracks behavioral changes over time, helping therapists and parents measure therapy
+          effectiveness.</p>
+        <span class="feat-tag">Long-Term Care</span>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🔒</div>
+        <h3>Privacy First</h3>
+        <p>All data processed with strict HIPAA-aligned protocols. Videos are analyzed and immediately deleted. No
+          identifiable data stored.</p>
+        <span class="feat-tag">HIPAA-Aligned</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-box">
+      <h2>Every month earlier matters.</h2>
+      <p>Early intervention before age 3 leads to dramatically better outcomes. NeuroCare AI exists to close the gap
+        between first concern and first support.</p>
+      <div class="cta-actions">
+        <a href="neurocare-screening.html" class="btn-primary" data-requires-auth="true">Start Screening — Free</a>
+        <a href="#" class="btn-secondary">For Clinicians →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="nc-footer">
+    <div class="footer-brand">🧠 NeuroCare AI</div>
+    <div class="footer-links" style="display:flex;gap:20px;">
+      <a href="index.html" style="color:var(--muted);text-decoration:none;">Home</a>
+      <a href="privacy.html" style="color:var(--muted);text-decoration:none;">Privacy</a>
+      <a href="terms.html" style="color:var(--muted);text-decoration:none;">Terms</a>
+      <a href="contact.html" style="color:var(--muted);text-decoration:none;">Contact</a>
+    </div>
+    <div class="footer-disclaimer">
+      <strong>⚠️ Medical Disclaimer:</strong> NeuroCare AI is a screening tool only and does not provide clinical
+      diagnosis. Always consult a licensed healthcare professional for medical evaluation.
+      <br>
+      <span style="display:block;margin-top:8px;font-size:0.8rem;color:var(--muted);">© 2026 NeuroCare AI. For
+        educational use.</span>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const AUTH_KEY = 'ncAuthUser';
+      let pendingRedirect = null;
+
+      function isAuthed() {
+        try {
+          return !!localStorage.getItem(AUTH_KEY);
+        } catch (e) {
+          return false;
+        }
+      }
+
+      function openAuth(mode, redirectTo) {
+        const overlay = document.getElementById('authOverlay');
+        if (!overlay) return;
+        pendingRedirect = redirectTo || null;
+
+        const tabSignIn = document.getElementById('tabSignIn');
+        const tabSignUp = document.getElementById('tabSignUp');
+        const nameField = document.getElementById('nameField');
+        const title = document.getElementById('authTitle');
+        const sub = document.getElementById('authSub');
+        const submitBtn = document.getElementById('authSubmitBtn');
+        const errorEl = document.getElementById('authError');
+        if (errorEl) errorEl.textContent = '';
+
+        const isSignUp = mode === 'signup';
+        if (tabSignIn && tabSignUp) {
+          tabSignIn.classList.toggle('active', !isSignUp);
+          tabSignUp.classList.toggle('active', isSignUp);
+        }
+        if (nameField) nameField.style.display = isSignUp ? 'block' : 'none';
+        if (title) title.textContent = isSignUp ? 'Create your account' : 'Welcome back';
+        if (sub) {
+          sub.textContent = isSignUp
+            ? 'Sign up once to unlock Screening and all demo features.'
+            : 'Sign in to resume access to Screening and demo features.';
+        }
+        if (submitBtn) submitBtn.textContent = isSignUp ? 'Create account' : 'Sign in';
+
+        overlay.classList.add('active');
+        const emailInput = document.getElementById('authEmail');
+        if (emailInput) emailInput.focus();
+        overlay.dataset.mode = isSignUp ? 'signup' : 'signin';
+      }
+
+      function closeAuth() {
+        const overlay = document.getElementById('authOverlay');
+        if (!overlay) return;
+        overlay.classList.remove('active');
+        pendingRedirect = null;
+      }
+
+      function handleProtectedClick(evt, href) {
+        if (isAuthed()) return;
+        if (evt) evt.preventDefault();
+        openAuth('signup', href || (evt && evt.currentTarget && evt.currentTarget.getAttribute('href')));
+      }
+
+      function bindEvents() {
+        const overlay = document.getElementById('authOverlay');
+        if (!overlay) return;
+
+        const navSignUpBtn = document.getElementById('navSignUpBtn');
+        if (navSignUpBtn) {
+          navSignUpBtn.addEventListener('click', function () {
+            openAuth('signup', null);
+          });
+        }
+
+        const closeBtn = document.getElementById('authCloseBtn');
+        if (closeBtn) closeBtn.addEventListener('click', closeAuth);
+        overlay.addEventListener('click', function (e) {
+          if (e.target === overlay) closeAuth();
+        });
+
+        const tabSignIn = document.getElementById('tabSignIn');
+        const tabSignUp = document.getElementById('tabSignUp');
+        if (tabSignIn) {
+          tabSignIn.addEventListener('click', function () { openAuth('signin', pendingRedirect); });
+        }
+        if (tabSignUp) {
+          tabSignUp.addEventListener('click', function () { openAuth('signup', pendingRedirect); });
+        }
+
+        const protectedLinks = document.querySelectorAll('[data-requires-auth="true"]');
+        protectedLinks.forEach(function (link) {
+          link.addEventListener('click', function (e) {
+            if (!isAuthed()) {
+              handleProtectedClick(e, link.getAttribute('href'));
+            }
+          });
+        });
+
+        const form = document.getElementById('authForm');
+        if (form) {
+          form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const mode = overlay.dataset.mode || 'signin';
+            const isSignUp = mode === 'signup';
+
+            const nameEl = document.getElementById('authName');
+            const emailEl = document.getElementById('authEmail');
+            const passEl = document.getElementById('authPassword');
+            const errorEl = document.getElementById('authError');
+            if (errorEl) errorEl.textContent = '';
+
+            const email = emailEl ? emailEl.value.trim() : '';
+            const password = passEl ? passEl.value.trim() : '';
+            const fullName = nameEl ? nameEl.value.trim() : '';
+
+            if (!email || !password || (isSignUp && !fullName)) {
+              if (errorEl) errorEl.textContent = 'Please fill in all required fields.';
+              return;
+            }
+            if (password.length < 6) {
+              if (errorEl) errorEl.textContent = 'Password should be at least 6 characters.';
+              return;
+            }
+
+            try {
+              const user = { email: email, name: fullName || email.split('@')[0], role: 'parent', createdAt: new Date().toISOString() };
+              localStorage.setItem(AUTH_KEY, JSON.stringify(user));
+            } catch (err) {
+              if (errorEl) errorEl.textContent = 'Unable to save login on this device.';
+              return;
+            }
+
+            closeAuth();
+            // Always redirect to dashboard after auth
+            const dashUrl = (function () {
+              try {
+                const u = JSON.parse(localStorage.getItem(AUTH_KEY));
+                return (u && u.role === 'clinician') ? 'clinician-dashboard.html' : 'parent-dashboard.html';
+              } catch (e) { return 'parent-dashboard.html'; }
+            })();
+            window.location.href = pendingRedirect || dashUrl;
+          });
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', bindEvents);
+    })();
+  </script>
+  <script src="js/auth.js"></script>
+  <script src="js/navigation.js"></script>
+</body>
+
+</html>

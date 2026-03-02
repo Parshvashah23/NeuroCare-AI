@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroCare AI — Settings</title>
+    <meta name="description"
+        content="Manage your NeuroCare AI account, child profiles, notifications, and privacy settings.">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .content-area {
+            flex: 1;
+        }
+
+        .page-content {
+            padding: 28px 32px 48px;
+        }
+
+        .settings-layout {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 24px;
+            max-width: 1000px;
+        }
+
+        /* Settings Nav */
+        .settings-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .sn-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--text-soft);
+            cursor: pointer;
+            transition: all 0.15s;
+            border: none;
+            background: none;
+            text-align: left;
+            width: 100%;
+        }
+
+        .sn-item:hover {
+            background: var(--surface2);
+            color: var(--text);
+        }
+
+        .sn-item.active {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent);
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+        }
+
+        .sp-section {
+            margin-bottom: 32px;
+            padding-bottom: 28px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sp-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .sp-title {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+        }
+
+        .sp-desc {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* Avatar */
+        .avatar-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .avatar-large {
+            width: 72px;
+            height: 72px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #050d1a;
+        }
+
+        .avatar-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        /* Toggle Switch */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .toggle-row:last-child {
+            border: none;
+        }
+
+        .tr-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .tr-desc {
+            font-size: 0.78rem;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            inset: 0;
+            background: var(--surface3);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--text);
+            bottom: 3px;
+            left: 3px;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch input:checked+.toggle-slider {
+            background: var(--accent);
+        }
+
+        .toggle-switch input:checked+.toggle-slider::before {
+            transform: translateX(20px);
+        }
+
+        /* Child Profile Cards */
+        .child-profiles {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .child-profile-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 18px;
+        }
+
+        .cpc-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .cpc-info {
+            flex: 1;
+        }
+
+        .cpc-name {
+            font-weight: 600;
+            font-size: 0.92rem;
+        }
+
+        .cpc-detail {
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+
+        .cpc-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Danger Zone */
+        .danger-zone {
+            background: rgba(248, 113, 113, 0.04);
+            border: 1px solid rgba(248, 113, 113, 0.15);
+            border-radius: var(--radius-md);
+            padding: 20px;
+        }
+
+        .dz-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(248, 113, 113, 0.1);
+        }
+
+        .dz-item:last-child {
+            border: none;
+        }
+
+        .dz-label h4 {
+            font-size: 0.92rem;
+            color: var(--danger);
+            margin-bottom: 2px;
+        }
+
+        .dz-label p {
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+
+        .btn-danger {
+            padding: 8px 18px;
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            background: transparent;
+            color: var(--danger);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-danger:hover {
+            background: rgba(248, 113, 113, 0.1);
+        }
+
+        .save-bar {
+            margin-top: 24px;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        @media(max-width:768px) {
+            .settings-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .settings-nav {
+                flex-direction: row;
+                overflow-x: auto;
+            }
+
+            .page-content {
+                padding: 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="nc-sidebar">
+            <div class="sb-logo">
+                <div class="sb-logo-mark">🧠</div>
+                <div>
+                    <div class="sb-logo-name">NeuroCare AI</div>
+                    <div class="sb-logo-sub">Parent Portal</div>
+                </div>
+            </div>
+            <nav class="sb-nav">
+                <div class="sb-section">Overview</div>
+                <a href="index.html" class="sb-item">
+                    <div class="sb-item-icon">🏡</div>Home
+                </a>
+                <a href="parent-dashboard.html" class="sb-item">
+                    <div class="sb-item-icon">🏠</div>Dashboard
+                </a>
+                <a href="reports.html" class="sb-item">
+                    <div class="sb-item-icon">📊</div>Reports
+                </a>
+                <div class="sb-section">Screening</div>
+                <a href="neurocare-screening.html" class="sb-item">
+                    <div class="sb-item-icon">🔬</div>Full Screening
+                </a>
+                <a href="mchat-screening.html" class="sb-item">
+                    <div class="sb-item-icon">📋</div>M-CHAT Screening
+                </a>
+                <a href="video-analysis.html" class="sb-item">
+                    <div class="sb-item-icon">🎥</div>Video Analysis
+                </a>
+                <div class="sb-section">Insights</div>
+                <a href="explainable-ai.html" class="sb-item">
+                    <div class="sb-item-icon">🔍</div>Explainable AI
+                </a>
+                <a href="progress-tracking.html" class="sb-item">
+                    <div class="sb-item-icon">📈</div>Progress Tracking
+                </a>
+                <div class="sb-section">Account</div>
+                <a href="settings.html" class="sb-item active">
+                    <div class="sb-item-icon">⚙️</div>Settings
+                </a>
+            </nav>
+            <div class="sb-bottom">
+                <div class="sb-user">
+                    <div class="sb-avatar">P</div>
+                    <div class="sb-user-info">
+                        <div class="sb-user-name">Parent</div>
+                        <div class="sb-user-role">Parent / Caregiver</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="nc-main-with-sidebar content-area">
+
+            <div class="nc-topbar">
+                <div>
+                    <h2>Settings</h2>
+                    <div class="tb-sub">Manage your account, profiles, and preferences</div>
+                </div>
+            </div>
+
+            <div class="page-content">
+                <div class="settings-layout">
+
+                    <!-- Settings Nav -->
+                    <div>
+                        <div class="settings-nav">
+                            <button class="sn-item active" onclick="switchSection('profile', this)">👤 Profile</button>
+                            <button class="sn-item" onclick="switchSection('children', this)">👶 Child Profiles</button>
+                            <button class="sn-item" onclick="switchSection('notifications', this)">🔔
+                                Notifications</button>
+                            <button class="sn-item" onclick="switchSection('data', this)">🗄️ Data & Privacy</button>
+                        </div>
+                    </div>
+
+                    <!-- Settings Panels -->
+                    <div>
+                        <!-- Profile Panel -->
+                        <div class="settings-panel" id="sec-profile">
+                            <div class="sp-section">
+                                <div class="sp-title">Your Profile</div>
+                                <div class="sp-desc">Manage your account information and appearance.</div>
+
+                                <div class="avatar-row">
+                                    <div class="avatar-large" id="settingsAvatar">P</div>
+                                    <div class="avatar-actions">
+                                        <button class="btn-ghost" style="font-size:0.8rem">📷 Change Avatar</button>
+                                        <span style="font-size:0.72rem; color: var(--muted);">Supports JPG, PNG · Max
+                                            2MB</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label" for="settingsName">Full Name</label>
+                                        <input class="form-input" type="text" id="settingsName" value="">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="settingsEmail">Email</label>
+                                        <input class="form-input" type="email" id="settingsEmail" value="">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label" for="settingsRole">Account Type</label>
+                                        <select class="form-input" id="settingsRole">
+                                            <option value="parent">Parent / Caregiver</option>
+                                            <option value="clinician">Clinician / Healthcare Provider</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="settingsPhone">Phone (optional)</label>
+                                        <input class="form-input" type="tel" id="settingsPhone"
+                                            placeholder="+1 (555) 000-0000">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="sp-section">
+                                <div class="sp-title">Change Password</div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label" for="currentPass">Current Password</label>
+                                        <input class="form-input" type="password" id="currentPass"
+                                            placeholder="••••••••">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="newPass">New Password</label>
+                                        <input class="form-input" type="password" id="newPass"
+                                            placeholder="Min 6 characters">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="save-bar">
+                                <button class="btn-secondary btn-sm">Cancel</button>
+                                <button class="btn-primary btn-sm" onclick="saveProfile()">Save Changes</button>
+                            </div>
+                        </div>
+
+                        <!-- Children Panel -->
+                        <div class="settings-panel" id="sec-children" style="display:none">
+                            <div class="sp-section">
+                                <div class="sp-title">Child Profiles</div>
+                                <div class="sp-desc">Manage the children you are tracking with NeuroCare AI.</div>
+
+                                <div class="child-profiles">
+                                    <div class="child-profile-card">
+                                        <div class="cpc-avatar" style="background:rgba(56,189,248,0.12)">👦</div>
+                                        <div class="cpc-info">
+                                            <div class="cpc-name">Aiden K.</div>
+                                            <div class="cpc-detail">2 years 6 months · Male · Added Jan 2026</div>
+                                        </div>
+                                        <div class="cpc-actions">
+                                            <button class="btn-ghost" style="font-size:0.8rem">✏️ Edit</button>
+                                            <button class="btn-danger" style="padding:6px 12px">Remove</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="child-profile-card">
+                                        <div class="cpc-avatar" style="background:rgba(129,140,248,0.12)">👧</div>
+                                        <div class="cpc-info">
+                                            <div class="cpc-name">Priya M.</div>
+                                            <div class="cpc-detail">3 years 0 months · Female · Added Feb 2026</div>
+                                        </div>
+                                        <div class="cpc-actions">
+                                            <button class="btn-ghost" style="font-size:0.8rem">✏️ Edit</button>
+                                            <button class="btn-danger" style="padding:6px 12px">Remove</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button class="btn-secondary btn-sm" style="margin-top:16px">+ Add New Child</button>
+                            </div>
+                        </div>
+
+                        <!-- Notifications Panel -->
+                        <div class="settings-panel" id="sec-notifications" style="display:none">
+                            <div class="sp-section">
+                                <div class="sp-title">Notification Preferences</div>
+                                <div class="sp-desc">Choose what updates you'd like to receive.</div>
+
+                                <div class="toggle-row">
+                                    <div>
+                                        <div class="tr-label">Screening Reminders</div>
+                                        <div class="tr-desc">Get reminded when it's time for a follow-up screening</div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+
+                                <div class="toggle-row">
+                                    <div>
+                                        <div class="tr-label">Report Ready Notifications</div>
+                                        <div class="tr-desc">Get notified when a new analysis report is generated</div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+
+                                <div class="toggle-row">
+                                    <div>
+                                        <div class="tr-label">Progress Milestones</div>
+                                        <div class="tr-desc">Celebrate when your child reaches therapy goals</div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+
+                                <div class="toggle-row">
+                                    <div>
+                                        <div class="tr-label">Platform Updates</div>
+                                        <div class="tr-desc">New features and improvements to NeuroCare AI</div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Data Panel -->
+                        <div class="settings-panel" id="sec-data" style="display:none">
+                            <div class="sp-section">
+                                <div class="sp-title">Data Export</div>
+                                <div class="sp-desc">Download a copy of all your data including screening results,
+                                    reports, and child profiles.</div>
+                                <button class="btn-secondary btn-sm">📥 Export All Data (JSON)</button>
+                            </div>
+
+                            <div class="sp-section">
+                                <div class="sp-title" style="color:var(--danger)">Danger Zone</div>
+                                <div class="danger-zone">
+                                    <div class="dz-item">
+                                        <div class="dz-label">
+                                            <h4>Clear All Screening Data</h4>
+                                            <p>Delete all saved screenings and reports. This cannot be undone.</p>
+                                        </div>
+                                        <button class="btn-danger">Clear Data</button>
+                                    </div>
+                                    <div class="dz-item">
+                                        <div class="dz-label">
+                                            <h4>Delete Account</h4>
+                                            <p>Permanently delete your account and all associated data.</p>
+                                        </div>
+                                        <button class="btn-danger" onclick="deleteAccount()">Delete Account</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <footer class="nc-footer footer-sidebar">
+                <div class="footer-brand">🧠 NeuroCare AI</div>
+                <div class="footer-links"><a href="index.html">Home</a><a href="privacy.html">Privacy</a><a
+                        href="terms.html">Terms</a><a href="contact.html">Contact</a></div>
+                <div class="footer-copy">© 2026 NeuroCare AI. For screening purposes only.</div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script>
+        if (!NeuroCareAuth.isAuthenticated()) {
+            window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+        }
+
+        // Populate profile fields
+        const user = NeuroCareAuth.getCurrentUser();
+        if (user) {
+            document.getElementById('settingsName').value = user.name || '';
+            document.getElementById('settingsEmail').value = user.email || '';
+            document.getElementById('settingsRole').value = user.role || 'parent';
+            document.getElementById('settingsAvatar').textContent = NeuroCareAuth.getInitials(user.name);
+        }
+
+        function switchSection(section, btn) {
+            document.querySelectorAll('.sn-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            ['profile', 'children', 'notifications', 'data'].forEach(s => {
+                const el = document.getElementById('sec-' + s);
+                if (el) el.style.display = s === section ? '' : 'none';
+            });
+        }
+
+        function saveProfile() {
+            const name = document.getElementById('settingsName').value.trim();
+            const email = document.getElementById('settingsEmail').value.trim();
+            const role = document.getElementById('settingsRole').value;
+            if (name && email) {
+                localStorage.setItem('ncAuthUser', JSON.stringify({ name, email, role, createdAt: user.createdAt }));
+                NeuroCareNav.updateSidebarUser();
+                alert('Profile saved!');
+            }
+        }
+
+        function deleteAccount() {
+            if (confirm('Are you sure you want to delete your account? This cannot be undone.')) {
+                localStorage.removeItem('ncAuthUser');
+                localStorage.removeItem('ncUsers');
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+
+</html>

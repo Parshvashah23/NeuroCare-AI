@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeuroCare AI — Clinician Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg: #050d1a;
+  --s1: #0a1628;
+  --s2: #0f1f35;
+  --s3: #1a2942;
+  --b: rgba(100,180,255,0.12);
+  --bb: rgba(100,180,255,0.25);
+  --a: #38bdf8;
+  --a2: #818cf8;
+  --a3: #34d399;
+  --r: #f87171;
+  --g: #34d399;
+  --y: #fbbf24;
+  --amber: #fbbf24;
+  --rose: #f87171;
+  --t: #e2eaf5;
+  --ts: #7a9abf;
+  --td: rgba(100,180,255,0.08);
+  --card: #0a1628;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
+
+/* SIDEBAR LAYOUT */
+.layout{display:flex;min-height:100vh}
+.sidebar{width:240px;background:var(--s1);border-right:1px solid var(--b);position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:50}
+.sb-logo{padding:20px 20px 16px;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:10px}
+.sb-logo-mark{width:32px;height:32px;background:linear-gradient(135deg,var(--a),var(--a2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.sb-logo-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:var(--t)}
+.sb-logo-sub{font-size:.65rem;color:var(--ts);font-weight:500}
+.sb-nav{flex:1;padding:16px 12px;overflow-y:auto}
+.sb-section{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--ts);padding:0 8px;margin:12px 0 6px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;font-size:.84rem;font-weight:500;color:var(--ts);transition:all .15s;margin-bottom:2px;text-decoration:none}
+.sb-item:hover{background:var(--s2);color:var(--t)}
+.sb-item.active{background:rgba(56,189,248,0.12);color:var(--a);font-weight:600}
+.sb-item-icon{font-size:1rem;width:22px;text-align:center}
+.sb-badge{margin-left:auto;background:var(--r);color:#fff;font-size:.65rem;font-weight:700;border-radius:100px;padding:1px 7px}
+.sb-green{background:var(--g) !important}
+.sb-bottom{padding:16px;border-top:1px solid var(--b)}
+.sb-user{display:flex;align-items:center;gap:10px}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--a),var(--a2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem}
+.sb-user-info{flex:1}
+.sb-user-name{font-size:.83rem;font-weight:600}
+.sb-user-role{font-size:.72rem;color:var(--ts)}
+
+/* MAIN */
+.main{margin-left:240px;flex:1;display:flex;flex-direction:column}
+.topbar{background:var(--s1);border-bottom:1px solid var(--b);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
+.tb-left h2{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem}
+.tb-left p{font-size:.78rem;color:var(--ts);margin-top:2px}
+.tb-actions{display:flex;gap:8px;align-items:center}
+.tb-btn{display:flex;align-items:center;gap:6px;padding:7px 16px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+.tb-primary{background:linear-gradient(135deg,var(--a),var(--a2));color:#fff}
+.tb-primary:hover{opacity:0.88;transform:translateY(-1px)}
+.tb-secondary{background:var(--s2);color:var(--t);border:1px solid var(--b)}
+.tb-secondary:hover{background:var(--s3)}
+.notif-btn{width:36px;height:36px;border-radius:8px;background:var(--s2);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;font-size:1rem}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--r);border:1.5px solid var(--s1)}
+
+.content{padding:28px 32px;flex:1}
+
+/* STAT CARDS */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat-card{background:var(--card);border:1px solid var(--b);border-radius:14px;padding:20px;transition:all .2s}
+.stat-card:hover{border-color:var(--a);transform:translateY(-2px)}
+.sc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.sc-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+.sc-trend{font-size:.72rem;font-weight:600;padding:3px 8px;border-radius:100px}
+.trend-up{background:rgba(248,113,113,.08);color:var(--r)}
+.trend-dn{background:rgba(52,211,153,.08);color:var(--g)}
+.sc-val{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:500;letter-spacing:-.02em;margin-bottom:4px}
+.sc-label{font-size:.78rem;color:var(--ts)}
+.sc-sub{font-size:.7rem;color:var(--ts);margin-top:6px;padding-top:6px;border-top:1px solid var(--b)}
+
+/* PATIENT TABLE */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-header h3{font-weight:700;font-size:.95rem}
+.search-bar{display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--b);border-radius:9px;padding:7px 14px;font-size:.82rem}
+.search-bar input{background:transparent;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--t);width:200px}
+.search-bar input::placeholder{color:var(--ts)}
+
+.patient-table{background:var(--card);border:1px solid var(--b);border-radius:14px;overflow:hidden;margin-bottom:28px}
+.pt-head{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr 100px;gap:0;background:var(--s2);border-bottom:1px solid var(--b)}
+.ph-cell{padding:10px 16px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ts)}
+.pt-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr 100px;gap:0;border-bottom:1px solid var(--b);transition:background .15s;cursor:pointer;align-items:center}
+.pt-row:last-child{border:none}
+.pt-row:hover{background:rgba(56,189,248,0.06)}
+.pt-row.selected{background:rgba(56,189,248,0.12);border-left:3px solid var(--a)}
+.pc{padding:12px 16px;font-size:.83rem}
+.patient-name-cell{display:flex;align-items:center;gap:10px}
+.p-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0}
+.p-name{font-weight:600;font-size:.85rem}
+.p-id{font-size:.7rem;color:var(--ts);font-family:'DM Sans',sans-serif}
+.risk-pill{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:600;padding:3px 10px;border-radius:100px}
+.rp-h{background:rgba(248,113,113,.08);color:var(--r);border:1px solid rgba(248,113,113,.15)}
+.rp-m{background:rgba(251,191,36,.08);color:var(--y);border:1px solid rgba(251,191,36,.15)}
+.rp-l{background:rgba(52,211,153,.08);color:var(--g);border:1px solid rgba(52,211,153,.15)}
+.rp-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.score-chip{font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500}
+.status-pill{font-size:.72rem;font-weight:600;padding:3px 10px;border-radius:100px}
+.sp-pending{background:rgba(251,191,36,.08);color:var(--y)}
+.sp-complete{background:rgba(52,211,153,.08);color:var(--g)}
+.sp-review{background:rgba(56,189,248,.08);color:var(--a)}
+.action-btns{display:flex;gap:4px}
+.action-btn{width:28px;height:28px;border-radius:6px;background:var(--s2);border:1px solid var(--b);font-size:.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.action-btn:hover{background:var(--s3)}
+
+/* BOTTOM GRID */
+.bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+
+/* PATIENT DETAIL */
+.patient-detail{background:var(--card);border:1px solid var(--b);border-radius:14px;overflow:hidden}
+.pd-header{padding:18px 20px;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:12px}
+.pd-avatar{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.pd-info h4{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem}
+.pd-info p{font-size:.77rem;color:var(--ts);margin-top:2px}
+.pd-body{padding:18px 20px}
+.pd-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b);font-size:.82rem}
+.pd-row:last-child{border:none}
+.pd-row span:first-child{color:var(--ts)}
+.pd-row span:last-child{font-weight:600}
+.pd-mini-chart{margin-top:16px}
+.pmc-title{font-size:.75rem;font-weight:600;color:var(--ts);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.mini-bars{display:flex;flex-direction:column;gap:6px}
+.mini-bar-row{display:flex;align-items:center;gap:8px;font-size:.78rem}
+.mb-label{min-width:110px;color:var(--ts)}
+.mb-bar-wrap{flex:1;height:6px;background:var(--s3);border-radius:100px;overflow:hidden}
+.mb-fill{height:100%;border-radius:100px;transition:width .8s}
+.mb-val{min-width:35px;font-weight:600;font-family:'DM Sans',sans-serif;font-size:.75rem;text-align:right}
+
+/* ALERTS */
+.alerts-panel{background:var(--card);border:1px solid var(--b);border-radius:14px;overflow:hidden}
+.ap-header{padding:16px 20px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between}
+.ap-header h4{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;display:flex;align-items:center;gap:6px}
+.alert-count{background:var(--r);color:#fff;font-size:.65rem;font-weight:700;border-radius:100px;padding:2px 7px}
+.clear-btn{font-size:.75rem;color:var(--a);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600}
+.alert-list{max-height:380px;overflow-y:auto}
+.alert-item{display:flex;gap:12px;padding:14px 20px;border-bottom:1px solid var(--b);transition:background .15s;cursor:pointer}
+.alert-item:last-child{border:none}
+.alert-item:hover{background:var(--s2)}
+.alert-item.unread{background:rgba(56,189,248,0.06)}
+.ai-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0}
+.ai-icon.red{background:rgba(248,113,113,.1)}
+.ai-icon.yellow{background:rgba(251,191,36,.1)}
+.ai-icon.blue{background:rgba(56,189,248,.1)}
+.ai-icon.green{background:rgba(52,211,153,.1)}
+.ai-body{flex:1}
+.ai-title{font-size:.83rem;font-weight:600;margin-bottom:2px}
+.ai-desc{font-size:.77rem;color:var(--ts);line-height:1.4}
+.ai-time{font-size:.7rem;color:var(--ts);margin-top:4px;font-family:'DM Sans',sans-serif}
+.ai-unread-dot{width:6px;height:6px;border-radius:50%;background:var(--a);flex-shrink:0;margin-top:4px}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--b);margin-bottom:20px}
+.tab{padding:9px 16px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;color:var(--ts);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.tab.active{color:var(--a);border-bottom-color:var(--a)}
+
+/* FILTER PILLS */
+.filter-row{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.fp{font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:600;padding:5px 14px;border-radius:100px;cursor:pointer;border:1px solid var(--b);background:var(--s2);color:var(--ts);transition:all .15s}
+.fp.active{background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;border-color:var(--a)}
+.fp:hover:not(.active){background:var(--s3)}
+
+@media(max-width:1100px){.stat-row{grid-template-columns:1fr 1fr}.bottom-grid{grid-template-columns:1fr}}
+@media(max-width:768px){.sidebar{display:none}.main{margin-left:0}.pt-head,.pt-row{grid-template-columns:2fr 1fr 1fr 80px}.ph-cell:nth-child(3),.ph-cell:nth-child(4),.ph-cell:nth-child(5),.pc:nth-child(3),.pc:nth-child(4),.pc:nth-child(5){display:none}}
+</style>
+</head>
+<body>
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-mark">🧠</div>
+      <div><div class="sb-logo-name">NeuroCare AI</div><div class="sb-logo-sub">Clinician Portal</div></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Overview</div>
+      <a href="#" class="sb-item active"><div class="sb-item-icon">🏠</div>Dashboard</a>
+      <a href="#" class="sb-item"><div class="sb-item-icon">👥</div>All Patients<span class="sb-badge">24</span></a>
+      <a href="#" class="sb-item"><div class="sb-item-icon">⚠️</div>Alerts<span class="sb-badge">7</span></a>
+      <div class="sb-section">Screening</div>
+      <a href="mchat-screening.html" class="sb-item"><div class="sb-item-icon">📋</div>M-CHAT Screening</a>
+      <a href="video-analysis.html" class="sb-item"><div class="sb-item-icon">🎥</div>Video Analysis</a>
+      <a href="explainable-ai.html" class="sb-item"><div class="sb-item-icon">🔍</div>Explainable AI</a>
+      <div class="sb-section">Analytics</div>
+      <a href="progress-tracking.html" class="sb-item"><div class="sb-item-icon">📈</div>Progress Tracking</a>
+      <a href="#" class="sb-item"><div class="sb-item-icon">📊</div>Population Stats</a>
+      <a href="#" class="sb-item"><div class="sb-item-icon">📄</div>Reports</a>
+      <div class="sb-section">Settings</div>
+      <a href="#" class="sb-item"><div class="sb-item-icon">🔔</div>Notifications</a>
+      <a href="#" class="sb-item"><div class="sb-item-icon">⚙️</div>Settings</a>
+    </nav>
+    <div class="sb-bottom">
+      <div class="sb-user">
+        <div class="sb-avatar">DR</div>
+        <div class="sb-user-info">
+          <div class="sb-user-name">Dr. Rahul Mehta</div>
+          <div class="sb-user-role">Developmental Pediatrician</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="tb-left">
+        <h2>Clinician Dashboard</h2>
+        <p>Monday, Feb 28, 2025 · 14 patients screened today</p>
+      </div>
+      <div class="tb-actions">
+        <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+        <button class="tb-btn tb-secondary" onclick="exportCSV()">📤 Export</button>
+        <button class="tb-btn tb-primary" onclick="newScreening()">+ New Screening</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- STATS -->
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="sc-top">
+            <div class="sc-icon" style="background:rgba(220,38,38,.08)">🔴</div>
+            <span class="sc-trend trend-up">↑ +3 today</span>
+          </div>
+          <div class="sc-val" style="color:var(--r)">7</div>
+          <div class="sc-label">High Risk Cases</div>
+          <div class="sc-sub">Require immediate review</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-top">
+            <div class="sc-icon" style="background:rgba(217,119,6,.08)">🟡</div>
+            <span class="sc-trend trend-up">↑ +5</span>
+          </div>
+          <div class="sc-val" style="color:var(--y)">11</div>
+          <div class="sc-label">Medium Risk</div>
+          <div class="sc-sub">Monitoring recommended</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-top">
+            <div class="sc-icon" style="background:rgba(22,163,74,.08)">🟢</div>
+            <span class="sc-trend trend-dn">↓ stable</span>
+          </div>
+          <div class="sc-val" style="color:var(--g)">24</div>
+          <div class="sc-label">Low Risk / Clear</div>
+          <div class="sc-sub">Routine monitoring</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-top">
+            <div class="sc-icon" style="background:rgba(37,99,235,.08)">📊</div>
+            <span class="sc-trend" style="background:rgba(37,99,235,.08);color:var(--a)">↑ 87%</span>
+          </div>
+          <div class="sc-val" style="color:var(--a)">42</div>
+          <div class="sc-label">Total Screened (30d)</div>
+          <div class="sc-sub">Avg confidence: 81%</div>
+        </div>
+      </div>
+
+      <!-- PATIENT TABLE -->
+      <div class="section-header">
+        <h3>Patient Screening Queue</h3>
+        <div style="display:flex;gap:10px;align-items:center">
+          <div class="search-bar">🔍 <input type="text" placeholder="Search patients…" oninput="filterTable(this.value)"></div>
+          <div class="filter-row" style="margin:0">
+            <div class="fp active" onclick="filterRisk('all',this)">All</div>
+            <div class="fp" onclick="filterRisk('high',this)" style="color:var(--r)">High</div>
+            <div class="fp" onclick="filterRisk('medium',this)" style="color:var(--y)">Medium</div>
+            <div class="fp" onclick="filterRisk('low',this)" style="color:var(--g)">Low</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="patient-table">
+        <div class="pt-head">
+          <div class="ph-cell">Patient</div>
+          <div class="ph-cell">Age</div>
+          <div class="ph-cell">Risk Level</div>
+          <div class="ph-cell">Score</div>
+          <div class="ph-cell">Confidence</div>
+          <div class="ph-cell">Status</div>
+          <div class="ph-cell">Actions</div>
+        </div>
+        <div id="patientRows"></div>
+      </div>
+
+      <!-- BOTTOM GRID -->
+      <div class="bottom-grid">
+        <!-- PATIENT DETAIL -->
+        <div class="patient-detail">
+          <div class="pd-header">
+            <div class="pd-avatar" style="background:rgba(220,38,38,.1)">👦</div>
+            <div class="pd-info">
+              <h4 id="detail-name">Aiden K. — Age 2.5 yrs</h4>
+              <p id="detail-sub">ID: NCR-2024-0047 · Screened today · High Risk</p>
+            </div>
+          </div>
+          <div class="tabs">
+            <div class="tab active" onclick="switchTab('overview',this)">Overview</div>
+            <div class="tab" onclick="switchTab('signals',this)">Signals</div>
+            <div class="tab" onclick="switchTab('history',this)">History</div>
+            <div class="tab" onclick="switchTab('notes',this)">Notes</div>
+          </div>
+          <div class="pd-body" id="detail-body">
+            <!-- overview -->
+            <div id="tab-overview">
+              <div class="pd-row"><span>Overall Risk Score</span><span style="color:var(--r);font-family:'DM Sans',sans-serif">78%</span></div>
+              <div class="pd-row"><span>Model Confidence</span><span style="font-family:'DM Sans',sans-serif">84%</span></div>
+              <div class="pd-row"><span>Questionnaire Score</span><span style="font-family:'DM Sans',sans-serif">82%</span></div>
+              <div class="pd-row"><span>Video Analysis Score</span><span style="font-family:'DM Sans',sans-serif">71%</span></div>
+              <div class="pd-row"><span>Flags Triggered</span><span style="color:var(--r)">8 / 10</span></div>
+              <div class="pd-row"><span>Respondent</span><span>Parent / Guardian</span></div>
+              <div class="pd-row"><span>Screened On</span><span>Feb 28, 2025</span></div>
+              <div class="pd-mini-chart">
+                <div class="pmc-title">Signal Breakdown</div>
+                <div class="mini-bars">
+                  <div class="mini-bar-row"><span class="mb-label">Eye Contact</span><div class="mb-bar-wrap"><div class="mb-fill" style="width:22%;background:var(--r)"></div></div><span class="mb-val" style="color:var(--r)">22%</span></div>
+                  <div class="mini-bar-row"><span class="mb-label">Name Response</span><div class="mb-bar-wrap"><div class="mb-fill" style="width:18%;background:var(--r)"></div></div><span class="mb-val" style="color:var(--r)">18%</span></div>
+                  <div class="mini-bar-row"><span class="mb-label">Repetitive Motion</span><div class="mb-bar-wrap"><div class="mb-fill" style="width:82%;background:var(--r)"></div></div><span class="mb-val" style="color:var(--r)">82%</span></div>
+                  <div class="mini-bar-row"><span class="mb-label">Gesture Use</span><div class="mb-bar-wrap"><div class="mb-fill" style="width:15%;background:var(--y)"></div></div><span class="mb-val" style="color:var(--y)">15%</span></div>
+                  <div class="mini-bar-row"><span class="mb-label">Social Referencing</span><div class="mb-bar-wrap"><div class="mb-fill" style="width:25%;background:var(--r)"></div></div><span class="mb-val" style="color:var(--r)">25%</span></div>
+                </div>
+              </div>
+            </div>
+            <div id="tab-signals" style="display:none">
+              <p style="font-size:.85rem;color:var(--ts);line-height:1.75">Detailed behavioral signal breakdown from multimodal AI analysis. Questionnaire contributed 8/10 flags. Video analysis detected 14 behavioral events including repetitive motor patterns, gaze aversion episodes, and absent social referencing. Full explainable AI breakdown available.</p>
+              <div style="margin-top:16px;display:flex;gap:8px">
+                <a href="explainable-ai.html" style="font-size:.8rem;font-weight:600;color:var(--a);background:rgba(37,99,235,.07);border:1px solid rgba(37,99,235,.15);border-radius:8px;padding:7px 14px;text-decoration:none;display:inline-flex;align-items:center;gap:5px">🔍 View XAI Report</a>
+                <a href="video-analysis.html" style="font-size:.8rem;font-weight:600;color:var(--ts);background:var(--s2);border:1px solid var(--b);border-radius:8px;padding:7px 14px;text-decoration:none">🎥 Video Analysis</a>
+              </div>
+            </div>
+            <div id="tab-history" style="display:none">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--s2);border-radius:8px;font-size:.82rem"><span>Feb 28, 2025</span><span style="color:var(--r);font-weight:600">78% — High</span><span style="color:var(--ts)">Current</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--s2);border-radius:8px;font-size:.82rem"><span>Nov 15, 2024</span><span style="color:var(--r);font-weight:600">72% — High</span><span style="color:var(--ts)">+3 mos</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--s2);border-radius:8px;font-size:.82rem"><span>Aug 10, 2024</span><span style="color:var(--y);font-weight:600">58% — Medium</span><span style="color:var(--ts)">Initial</span></div>
+              </div>
+            </div>
+            <div id="tab-notes" style="display:none">
+              <textarea style="width:100%;background:var(--s2);border:1px solid var(--b);border-radius:8px;padding:12px;font-family:'DM Sans',sans-serif;font-size:.83rem;color:var(--t);resize:vertical;min-height:120px;outline:none" placeholder="Add clinical notes…">Parent reports regression in language since 18 months. Eye contact was better at 12 months. Referred to speech-language pathology. Follow-up with developmental assessment scheduled for March 15.</textarea>
+              <button style="margin-top:10px;background:var(--a);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer" onclick="saveNotes()">Save Notes</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ALERTS -->
+        <div class="alerts-panel">
+          <div class="ap-header">
+            <h4>🔔 Clinical Alerts <span class="alert-count" id="alertCount">7</span></h4>
+            <button class="clear-btn" onclick="clearAlerts()">Mark all read</button>
+          </div>
+          <div class="alert-list" id="alertList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PATIENTS = [
+  { id:'NCR-0047', name:'Aiden K.', age:'2.5y', gender:'M', risk:'high', score:78, conf:84, status:'review', avatar:'👦', bg:'rgba(220,38,38,.08)' },
+  { id:'NCR-0052', name:'Priya R.', age:'3y', gender:'F', risk:'medium', score:51, conf:76, status:'pending', avatar:'👧', bg:'rgba(217,119,6,.08)' },
+  { id:'NCR-0039', name:'Leo M.', age:'2y', gender:'M', risk:'low', score:19, conf:91, status:'complete', avatar:'🧒', bg:'rgba(22,163,74,.08)' },
+  { id:'NCR-0058', name:'Zara T.', age:'2.5y', gender:'F', risk:'high', score:71, conf:79, status:'review', avatar:'👶', bg:'rgba(220,38,38,.08)' },
+  { id:'NCR-0061', name:'Noah S.', age:'3.5y', gender:'M', risk:'medium', score:48, conf:82, status:'pending', avatar:'🧒', bg:'rgba(217,119,6,.08)' },
+  { id:'NCR-0044', name:'Aria P.', age:'4y', gender:'F', risk:'low', score:22, conf:88, status:'complete', avatar:'👧', bg:'rgba(22,163,74,.08)' },
+  { id:'NCR-0065', name:'Kian L.', age:'2y', gender:'M', risk:'high', score:83, conf:86, status:'review', avatar:'👦', bg:'rgba(220,38,38,.08)' },
+  { id:'NCR-0072', name:'Mia W.', age:'3y', gender:'F', risk:'medium', score:55, conf:73, status:'pending', avatar:'👧', bg:'rgba(217,119,6,.08)' },
+];
+
+const ALERTS = [
+  { icon:'🚨', cls:'red', title:'Critical: Aiden K. — High Risk Score Elevated', desc:'Score increased from 72% to 78% since last screening. Immediate clinical review recommended.', time:'10 min ago', unread:true },
+  { icon:'⚠️', cls:'yellow', title:'Kian L. — New High Risk Screening Submitted', desc:'First-time screening returned 83% risk score. Parental contact initiated.', time:'32 min ago', unread:true },
+  { icon:'⚠️', cls:'yellow', title:'Zara T. — Video Analysis Flagged', desc:'14 behavioral events detected. Repetitive motion at 76%. Review video report.', time:'1h ago', unread:true },
+  { icon:'📋', cls:'blue', title:'Noah S. — Questionnaire Pending Review', desc:'Parent completed M-CHAT screening. Clinical sign-off required before report release.', time:'2h ago', unread:true },
+  { icon:'📋', cls:'blue', title:'Mia W. — Follow-up Screening Due', desc:'3-month re-screening reminder. Medium risk — monitoring protocol active.', time:'3h ago', unread:true },
+  { icon:'✅', cls:'green', title:'Leo M. — Cleared: Low Risk Confirmed', desc:'Second screening confirms low risk profile. Routine annual monitoring set.', time:'5h ago', unread:false },
+  { icon:'📄', cls:'blue', title:'Monthly Population Report Ready', desc:'February 2025 cohort report generated. 42 screenings, 17% high risk rate.', time:'8h ago', unread:false },
+];
+
+let currentFilter = 'all';
+let selectedPatient = 0;
+
+function renderTable(filter='all', search='') {
+  let rows = PATIENTS;
+  if (filter !== 'all') rows = rows.filter(p => p.risk === filter);
+  if (search) rows = rows.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.id.includes(search));
+  const riskPills = { high:'rp-h', medium:'rp-m', low:'rp-l' };
+  const riskLabels = { high:'High Risk', medium:'Medium Risk', low:'Low Risk' };
+  const statusPills = { pending:'sp-pending', complete:'sp-complete', review:'sp-review' };
+  const statusLabels = { pending:'Pending', complete:'Complete', review:'Review' };
+  const scoreColors = { high:'var(--r)', medium:'var(--y)', low:'var(--g)' };
+  document.getElementById('patientRows').innerHTML = rows.map((p,i) =>
+    `<div class="pt-row${i===0&&filter==='all'?' selected':''}" onclick="selectPatient(${PATIENTS.indexOf(p)})">
+      <div class="pc"><div class="patient-name-cell"><div class="p-avatar" style="background:${p.bg}">${p.avatar}</div><div><div class="p-name">${p.name}</div><div class="p-id">${p.id}</div></div></div></div>
+      <div class="pc" style="color:var(--ts)">${p.age} ${p.gender}</div>
+      <div class="pc"><span class="risk-pill ${riskPills[p.risk]}"><div class="rp-dot"></div>${riskLabels[p.risk]}</span></div>
+      <div class="pc"><span class="score-chip" style="color:${scoreColors[p.risk]}">${p.score}%</span></div>
+      <div class="pc"><span class="score-chip">${p.conf}%</span></div>
+      <div class="pc"><span class="status-pill ${statusPills[p.status]}">${statusLabels[p.status]}</span></div>
+      <div class="pc"><div class="action-btns"><div class="action-btn" onclick="event.stopPropagation();viewPatient(${PATIENTS.indexOf(p)})" title="View">👁️</div><div class="action-btn" onclick="event.stopPropagation();downloadReport()" title="Download">📄</div></div></div>
+    </div>`
+  ).join('');
+}
+
+function filterRisk(risk, btn) {
+  document.querySelectorAll('.fp').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter = risk;
+  renderTable(risk, document.querySelector('.search-bar input').value);
+}
+
+function filterTable(val) {
+  renderTable(currentFilter, val);
+}
+
+function selectPatient(i) {
+  selectedPatient = i;
+  const p = PATIENTS[i];
+  document.querySelectorAll('.pt-row').forEach((r,j) => r.classList.toggle('selected', j === i));
+  document.getElementById('detail-name').textContent = `${p.name} — Age ${p.age}`;
+  document.getElementById('detail-sub').textContent = `ID: ${p.id} · ${p.status === 'complete' ? 'Screened today' : 'Pending review'} · ${p.risk.charAt(0).toUpperCase()+p.risk.slice(1)} Risk`;
+}
+
+function viewPatient(i) { selectPatient(i); }
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  ['overview','signals','history','notes'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t === tab ? 'block' : 'none';
+  });
+}
+
+function renderAlerts() {
+  document.getElementById('alertList').innerHTML = ALERTS.map(a =>
+    `<div class="alert-item${a.unread?' unread':''}">
+      <div class="ai-icon ${a.cls}">${a.icon}</div>
+      <div class="ai-body">
+        <div class="ai-title">${a.title}</div>
+        <div class="ai-desc">${a.desc}</div>
+        <div class="ai-time">${a.time}</div>
+      </div>
+      ${a.unread ? '<div class="ai-unread-dot"></div>' : ''}
+    </div>`
+  ).join('');
+}
+
+function clearAlerts() {
+  ALERTS.forEach(a => a.unread = false);
+  renderAlerts();
+  document.getElementById('alertCount').textContent = '0';
+  document.getElementById('alertCount').style.background = 'var(--g)';
+}
+
+function saveNotes() { alert('Notes saved successfully!'); }
+function exportCSV() { alert('Exporting patient data to CSV…'); }
+function newScreening() { window.location.href = 'mchat-screening.html'; }
+function downloadReport() { alert('Generating PDF report…'); }
+
+renderTable();
+renderAlerts();
+</script>
+</body>
+</html>

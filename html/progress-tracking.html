@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NeuroCare AI — Progress Tracking</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    :root {
+      --bg: #050d1a;
+      --s1: #0a1628;
+      --s2: #0f1f35;
+      --s3: #1a2942;
+      --b: rgba(100, 180, 255, 0.12);
+      --bb: rgba(100, 180, 255, 0.25);
+      --a: #38bdf8;
+      --a2: #818cf8;
+      --a3: #34d399;
+      --r: #f87171;
+      --g: #34d399;
+      --y: #fbbf24;
+      --amber: #fbbf24;
+      --rose: #f87171;
+      --t: #e2eaf5;
+      --ts: #7a9abf;
+      --td: rgba(100, 180, 255, 0.08);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--t);
+      min-height: 100vh
+    }
+
+    /* NAV */
+    nav {
+      background: var(--s1);
+      border-bottom: 1px solid var(--b);
+      padding: 14px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--t)
+    }
+
+    .logo-mark {
+      width: 30px;
+      height: 30px;
+      background: linear-gradient(135deg, var(--a), var(--a2));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px
+    }
+
+    .logo-name {
+      color: var(--a)
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 6px
+    }
+
+    .nav-link {
+      padding: 6px 14px;
+      border-radius: 7px;
+      font-size: .82rem;
+      font-weight: 500;
+      text-decoration: none;
+      color: var(--ts);
+      transition: all .2s
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: var(--a);
+      background: rgba(56, 189, 248, 0.12)
+    }
+
+    /* HERO */
+    .hero {
+      padding: 56px 48px 40px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 32px;
+      border-bottom: 1px solid var(--b)
+    }
+
+    .hero-left {
+      max-width: 560px
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: .75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--a);
+      background: rgba(56, 189, 248, 0.06);
+      border: 1px solid rgba(56, 189, 248, 0.15);
+      border-radius: 100px;
+      padding: 4px 14px;
+      margin-bottom: 18px
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -.03em;
+      line-height: 1.05;
+      margin-bottom: 14px
+    }
+
+    .grad {
+      color: var(--a)
+    }
+
+    .hero-sub {
+      color: var(--ts);
+      font-size: .95rem;
+      line-height: 1.75
+    }
+
+    .hero-right {
+      display: flex;
+      gap: 16px
+    }
+
+    .hero-stat {
+      background: var(--s1);
+      border: 1px solid var(--b);
+      border-radius: 16px;
+      padding: 20px 24px;
+      text-align: center;
+      min-width: 120px
+    }
+
+    .hs-val {
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -.03em
+    }
+
+    .hs-label {
+      font-size: .75rem;
+      color: var(--ts);
+      margin-top: 4px
+    }
+
+    .hs-trend {
+      font-size: .72rem;
+      margin-top: 8px;
+      font-weight: 600
+    }
+
+    .t-pos {
+      color: var(--a)
+    }
+
+    .t-neg {
+      color: var(--r)
+    }
+
+    .t-neutral {
+      color: var(--ts)
+    }
+
+    /* CHILD SELECTOR */
+    .child-bar {
+      padding: 24px 48px;
+      border-bottom: 1px solid var(--b);
+      background: var(--s1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      overflow-x: auto
+    }
+
+    .child-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--b);
+      border-radius: 100px;
+      padding: 8px 18px;
+      cursor: pointer;
+      transition: all .2s;
+      white-space: nowrap;
+      background: var(--s2)
+    }
+
+    .child-chip:hover {
+      border-color: var(--bb)
+    }
+
+    .child-chip.active {
+      border-color: var(--a);
+      background: rgba(56, 189, 248, 0.12)
+    }
+
+    .cc-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .85rem
+    }
+
+    .cc-name {
+      font-size: .82rem;
+      font-weight: 600
+    }
+
+    .cc-risk {
+      font-size: .7rem;
+      font-weight: 600
+    }
+
+    /* MAIN CONTENT */
+    .content {
+      padding: 32px 48px;
+      max-width: 1280px;
+      margin: 0 auto
+    }
+
+    /* TOP ROW */
+    .top-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px
+    }
+
+    /* MAIN CHART */
+    .chart-card {
+      background: var(--s1);
+      border: 1px solid var(--b);
+      border-radius: 20px;
+      overflow: hidden
+    }
+
+    .cc-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--b);
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .cc-header h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem
+    }
+
+    .cc-controls {
+      display: flex;
+      gap: 6px
+    }
+
+    .range-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: .75rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--b);
+      background: transparent;
+      color: var(--ts);
+      transition: all .2s
+    }
+
+    .range-btn.active {
+      background: linear-gradient(135deg, var(--a), var(--a2));
+      color: #fff;
+      border-color: var(--a)
+    }
+
+    .chart-area {
+      padding: 24px;
+      position: relative
+    }
+
+    .chart-canvas-wrap {
+      position: relative;
+      width: 100%
+    }
+
+    canvas {
+      width: 100% !important
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 16px;
+      margin-top: 14px;
+      flex-wrap: wrap
+    }
+
+    .cl-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: .78rem;
+      color: var(--ts)
+    }
+
+    .cl-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%
+    }
+
+    .cl-line {
+      width: 16px;
+      height: 3px;
+      border-radius: 2px
+    }
+
+    /* RIGHT CARDS */
+    .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: 16px
+    }
+
+    .milestone-card {
+      background: var(--s1);
+      border: 1px solid var(--b);
+      border-radius: 16px;
+      padding: 20px
+    }
+
+    .milestone-card h4 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .88rem;
+      margin-bottom: 14px
+    }
+
+    .milestone-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .milestone {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px
+    }
+
+    .m-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .8rem;
+      flex-shrink: 0;
+      margin-top: 1px
+    }
+
+    .m-achieved {
+      background: rgba(52, 211, 153, 0.1)
+    }
+
+    .m-pending {
+      background: var(--s2)
+    }
+
+    .m-info {
+      flex: 1
+    }
+
+    .m-name {
+      font-size: .82rem;
+      font-weight: 600;
+      margin-bottom: 2px
+    }
+
+    .m-date {
+      font-size: .72rem;
+      color: var(--ts)
+    }
+
+    .m-connector {
+      width: 2px;
+      height: 8px;
+      background: var(--td);
+      margin: 0 13px
+    }
+
+    /* DOMAIN PROGRESS */
+    .domain-card {
+      background: var(--s1);
+      border: 1px solid var(--b);
+      border-radius: 16px;
+      padding: 20px
+    }
+
+    .domain-card h4 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .88rem;
+      margin-bottom: 14px
+    }
+
+    .domain-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 12px
+    }
+
+    .dr-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+      font-size: .8rem
+    }
+
+    .dr-name {
+      font-weight: 600
+    }
+
+    .dr-change {
+      font-size: .73rem;
+      font-weight: 600
+    }
+
+    .change-pos {
+      color: var(--a)
+    }
+
+    .change-neg {
+      color: var(--r)
+    }
+
+    .change-neutral {
+      color: var(--ts)
+    }
+
+    .dr-bar {
+      height: 8px;
+      background: var(--s3);
+      border-radius: 100px;
+      overflow: hidden;
+      position: relative
+    }
+
+    .dr-fill-before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      border-radius: 100px;
+      opacity: .35;
+      transition: width .8s
+    }
+
+    .dr-fill-now {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      border-radius: 100px;
+      transition: width 1s ease
+    }
+
+    /* SESSION LOG */
+    .sessions-card {
+      background: var(--s1);
+      border: 1px solid var(--b);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 24px
+    }
+
+    .sc-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--b);
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .sc-header h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .95rem
+    }
+
+    .session-rows {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 0
+    }
+
+    .session-card {
+      padding: 20px 24px;
+      border-right: 1px solid var(--b);
+      border-bottom: 1px solid var(--b);
+      cursor: pointer;
+      transition: background .15s
+    }
+
+    .session-card:hover {
+      background: var(--s2)
+    }
+
+    .session-card.active {
+      background: rgba(56, 189, 248, 0.06);
+      border-left: 3px solid var(--a)
+    }
+
+    .sess-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px
+    }
+
+    .sess-date {
+      font-family: 'Syne', sans-serif;
+      font-size: .95rem;
+      font-weight: 700
+    }
+
+    .sess-badge {
+      font-size: .7rem;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 100px
+    }
+
+    .sb-h {
+      background: rgba(248, 113, 113, .08);
+      color: var(--r)
+    }
+
+    .sb-m {
+      background: rgba(251, 191, 36, .08);
+      color: var(--amber)
+    }
+
+    .sb-l {
+      background: rgba(52, 211, 153, .08);
+      color: var(--a)
+    }
+
+    .sess-score {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -.03em;
+      margin-bottom: 4px
+    }
+
+    .sess-mini-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 10px
+    }
+
+    .smb {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: .72rem;
+      color: var(--ts)
+    }
+
+    .smb-label {
+      min-width: 80px
+    }
+
+    .smb-bar {
+      flex: 1;
+      height: 4px;
+      background: var(--s3);
+      border-radius: 100px;
+      overflow: hidden
+    }
+
+    .smb-fill {
+      height: 100%;
+      border-radius: 100px
+    }
+
+    .smb-val {
+      min-width: 28px;
+      text-align: right;
+      font-weight: 600
+    }
+
+    /* THERAPY NOTES */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px
+    }
+
+    .goals-card {
+      background: var(--s1);
+      border: 1px solid var(--b);
+      border-radius: 16px;
+      padding: 22px
+    }
+
+    .goals-card h4 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .9rem;
+      margin-bottom: 16px
+    }
+
+    .goal-item {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--b)
+    }
+
+    .goal-item:last-child {
+      border: none;
+      margin: 0;
+      padding: 0
+    }
+
+    .goal-check {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--td);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .65rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+      cursor: pointer;
+      transition: all .2s
+    }
+
+    .goal-check.done {
+      background: var(--a);
+      border-color: var(--a);
+      color: #fff
+    }
+
+    .goal-text {
+      flex: 1
+    }
+
+    .goal-name {
+      font-size: .83rem;
+      font-weight: 600;
+      margin-bottom: 2px
+    }
+
+    .goal-prog {
+      font-size: .73rem;
+      color: var(--ts)
+    }
+
+    .goal-bar {
+      height: 4px;
+      background: var(--s3);
+      border-radius: 100px;
+      overflow: hidden;
+      margin-top: 6px
+    }
+
+    .goal-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: var(--a);
+      transition: width .8s
+    }
+
+    .insights-card {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.06), rgba(129, 140, 248, 0.06));
+      border: 1px solid rgba(56, 189, 248, 0.12);
+      border-radius: 16px;
+      padding: 22px
+    }
+
+    .insights-card h4 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .9rem;
+      margin-bottom: 16px;
+      color: var(--a)
+    }
+
+    .insight-item {
+      background: var(--s1);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 10px
+    }
+
+    .insight-item:last-child {
+      margin: 0
+    }
+
+    .ii-icon {
+      font-size: 1rem;
+      margin-bottom: 6px
+    }
+
+    .ii-title {
+      font-size: .82rem;
+      font-weight: 600;
+      margin-bottom: 4px
+    }
+
+    .ii-text {
+      font-size: .77rem;
+      color: var(--ts);
+      line-height: 1.55
+    }
+
+    /* REPORT BTN */
+    .report-bar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap
+    }
+
+    .rb {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 11px 22px;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all .2s
+    }
+
+    .rb-primary {
+      background: linear-gradient(135deg, var(--a), var(--a2));
+      color: #fff
+    }
+
+    .rb-primary:hover {
+      opacity: 0.88;
+      transform: translateY(-1px)
+    }
+
+    .rb-secondary {
+      background: var(--s1);
+      color: var(--t);
+      border: 1px solid var(--b)
+    }
+
+    .rb-secondary:hover {
+      background: var(--s2)
+    }
+
+    @media(max-width:1024px) {
+      .top-row {
+        grid-template-columns: 1fr
+      }
+
+      .bottom-grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media(max-width:768px) {
+
+      nav,
+      .hero,
+      .child-bar,
+      .content {
+        padding-left: 20px;
+        padding-right: 20px
+      }
+
+      .hero {
+        flex-direction: column
+      }
+
+      .hero-right {
+        flex-wrap: wrap
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="nc-tool-topbar">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">🧠</div><span class="logo-name">NeuroCare</span>&nbsp;AI
+    </a>
+    <div class="tool-page-badge">📈 Progress Tracking</div>
+    <a href="#" class="tool-back-btn" onclick="window.location.href=NeuroCareAuth.getDashboardUrl();return false;">←
+      Back to Dashboard</a>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-left">
+      <div class="hero-tag">📈 Longitudinal Monitoring</div>
+      <h1>Progress <span class="grad">Tracking</span><br>& Therapy Outcomes</h1>
+      <p class="hero-sub">Track behavioral development across multiple screenings over time. See how interventions are
+        working, celebrate milestones, and identify where more support is needed.</p>
+    </div>
+    <div class="hero-right">
+      <div class="hero-stat">
+        <div class="hs-val" style="color:var(--a)">6</div>
+        <div class="hs-label">Screenings</div>
+        <div class="hs-trend t-pos">↓ Risk improving</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hs-val" style="color:var(--amber)">8mo</div>
+        <div class="hs-label">Tracked</div>
+        <div class="hs-trend t-neutral">Since Aug 2024</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hs-val" style="color:var(--a)">12</div>
+        <div class="hs-label">Goals Met</div>
+        <div class="hs-trend t-pos">↑ +4 this month</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHILD SELECTOR -->
+  <div class="child-bar">
+    <div class="child-chip active" onclick="selectChild('aiden',this)">
+      <div class="cc-avatar">👦</div>
+      <div>
+        <div class="cc-name">Aiden K.</div>
+        <div class="cc-risk" style="color:var(--r)">High → Improving</div>
+      </div>
+    </div>
+    <div class="child-chip" onclick="selectChild('priya',this)">
+      <div class="cc-avatar">👧</div>
+      <div>
+        <div class="cc-name">Priya R.</div>
+        <div class="cc-risk" style="color:var(--amber)">Medium — Stable</div>
+      </div>
+    </div>
+    <div class="child-chip" onclick="selectChild('leo',this)">
+      <div class="cc-avatar">🧒</div>
+      <div>
+        <div class="cc-name">Leo M.</div>
+        <div class="cc-risk" style="color:var(--a)">Low — On Track</div>
+      </div>
+    </div>
+    <div class="child-chip" onclick="selectChild('zara',this)">
+      <div class="cc-avatar">👶</div>
+      <div>
+        <div class="cc-name">Zara T.</div>
+        <div class="cc-risk" style="color:var(--r)">High — Monitoring</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- TOP ROW -->
+    <div class="top-row">
+      <!-- MAIN CHART -->
+      <div class="chart-card">
+        <div class="cc-header">
+          <h3 id="chartTitle">Aiden K. — Risk Score Over Time</h3>
+          <div class="cc-controls">
+            <button class="range-btn active" onclick="setRange('3m',this)">3M</button>
+            <button class="range-btn" onclick="setRange('6m',this)">6M</button>
+            <button class="range-btn" onclick="setRange('all',this)">All</button>
+          </div>
+        </div>
+        <div class="chart-area">
+          <div class="chart-canvas-wrap">
+            <canvas id="progressChart" height="200"></canvas>
+          </div>
+          <div class="chart-legend">
+            <div class="cl-item">
+              <div class="cl-line" style="background:var(--rose)"></div>Risk Score
+            </div>
+            <div class="cl-item">
+              <div class="cl-line" style="background:var(--a)"></div>Eye Contact
+            </div>
+            <div class="cl-item">
+              <div class="cl-line" style="background:var(--amber)"></div>Gesture Use
+            </div>
+            <div class="cl-item">
+              <div class="cl-line" style="background:var(--r);opacity:.3;height:24px;border-radius:2px;width:12px">
+              </div>High Risk Zone
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="right-col">
+        <!-- MILESTONES -->
+        <div class="milestone-card">
+          <h4>🏆 Developmental Milestones</h4>
+          <div class="milestone-list" id="milestoneList"></div>
+        </div>
+        <!-- DOMAIN PROGRESS -->
+        <div class="domain-card">
+          <h4>📊 Domain Progress (vs. last session)</h4>
+          <div class="domain-rows" id="domainRows"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SESSIONS -->
+    <div class="sessions-card">
+      <div class="sc-header">
+        <h3>Screening Session History</h3>
+        <div style="font-size:.78rem;color:var(--ts)">Click a session to compare</div>
+      </div>
+      <div class="session-rows" id="sessionRows"></div>
+    </div>
+
+    <!-- BOTTOM -->
+    <div class="bottom-grid">
+      <div class="goals-card">
+        <h4>🎯 Therapy Goals & Targets</h4>
+        <div id="goalList"></div>
+      </div>
+      <div class="insights-card">
+        <h4>🌱 AI Progress Insights</h4>
+        <div id="insightList"></div>
+      </div>
+    </div>
+
+    <!-- REPORT BAR -->
+    <div class="report-bar">
+      <button class="rb rb-primary" onclick="alert('Generating longitudinal PDF report…')">📄 Export Progress
+        Report</button>
+      <button class="rb rb-secondary" onclick="alert('Sharing with clinician…')">🔗 Share with Clinician</button>
+      <button class="rb rb-secondary" onclick="alert('Setting reminder…')">📅 Schedule Next Screening</button>
+      <button class="rb rb-secondary" onclick="window.print()">🖨️ Print</button>
+    </div>
+  </div>
+
+  <script>
+    const CHILD_DATA = {
+      aiden: {
+        name: 'Aiden K.', risk: 'high→improving',
+        sessions: [
+          { date: 'Aug 2024', score: 72, eye: 18, gest: 12, rep: 88, label: 'sb-h', badge: 'High Risk', color: 'var(--rose)' },
+          { date: 'Sep 2024', score: 75, eye: 20, gest: 15, rep: 85, label: 'sb-h', badge: 'High Risk', color: 'var(--rose)' },
+          { date: 'Oct 2024', score: 70, eye: 25, gest: 18, rep: 80, label: 'sb-h', badge: 'High Risk', color: 'var(--rose)' },
+          { date: 'Nov 2024', score: 68, eye: 28, gest: 22, rep: 75, label: 'sb-h', badge: 'High Risk', color: 'var(--rose)' },
+          { date: 'Jan 2025', score: 62, eye: 30, gest: 28, rep: 70, label: 'sb-h', badge: 'High Risk', color: 'var(--rose)' },
+          { date: 'Feb 2025', score: 78, eye: 32, gest: 38, rep: 78, label: 'sb-h', badge: 'High Risk', color: 'var(--rose)' }
+        ],
+        milestones: [
+          { name: 'First eye contact response', date: 'Oct 2024', done: true },
+          { name: 'Responded to name (2x)', date: 'Nov 2024', done: true },
+          { name: 'First pointing gesture', date: 'Dec 2024', done: true },
+          { name: 'Social smile with caregiver', date: 'Jan 2025', done: true },
+          { name: 'Two-word combination', date: 'Mar 2025', done: false },
+          { name: 'Pretend play episode', date: 'Apr 2025', done: false }
+        ],
+        domains: [
+          { name: 'Social Communication', before: 18, now: 32, color: 'var(--rose)', change: '+14%' },
+          { name: 'Eye Contact', before: 20, now: 32, color: 'var(--rose)', change: '+12%' },
+          { name: 'Gesture Use', before: 22, now: 38, color: 'var(--amber)', change: '+16%' },
+          { name: 'Language', before: 15, now: 22, color: 'var(--rose)', change: '+7%' },
+          { name: 'Repetitive Motion', before: 88, now: 78, color: 'var(--amber)', change: '-10%' }
+        ],
+        goals: [
+          { name: 'Eye contact during feeding (3s)', prog: 65, done: false },
+          { name: 'Name response in quiet env.', prog: 80, done: false },
+          { name: '3 pointing gestures/day', prog: 40, done: false },
+          { name: 'Social smile reciprocation', prog: 90, done: true },
+          { name: 'Caregiver joint play session', prog: 100, done: true }
+        ],
+        insights: [
+          { icon: '🌟', title: 'Significant Eye Contact Improvement', text: 'Eye contact has improved from 18% to 32% over 6 months. Early intervention is showing measurable results.' },
+          { icon: '📈', title: 'Gesture Use Trending Up', text: 'Gesture frequency increased 16% since August. Continue modeling pointing behaviors in daily routines.' },
+          { icon: '⚠️', title: 'Language Development Priority', text: 'Language scores remain the slowest-improving domain. Recommend increasing speech therapy from 1x to 2x per week.' }
+        ]
+      },
+      priya: {
+        name: 'Priya R.', risk: 'medium-stable',
+        sessions: [
+          { date: 'Oct 2024', score: 55, eye: 48, gest: 42, rep: 46, label: 'sb-m', badge: 'Medium Risk', color: 'var(--amber)' },
+          { date: 'Nov 2024', score: 52, eye: 52, gest: 44, rep: 44, label: 'sb-m', badge: 'Medium Risk', color: 'var(--amber)' },
+          { date: 'Dec 2024', score: 54, eye: 50, gest: 43, rep: 47, label: 'sb-m', badge: 'Medium Risk', color: 'var(--amber)' },
+          { date: 'Jan 2025', score: 49, eye: 56, gest: 48, rep: 42, label: 'sb-m', badge: 'Medium Risk', color: 'var(--amber)' },
+          { date: 'Feb 2025', score: 51, eye: 52, gest: 45, rep: 44, label: 'sb-m', badge: 'Medium Risk', color: 'var(--amber)' }
+        ],
+        milestones: [
+          { name: 'Consistent social smile', date: 'Oct 2024', done: true },
+          { name: 'Some pointing behavior', date: 'Nov 2024', done: true },
+          { name: 'Pretend play beginning', date: 'Jan 2025', done: true },
+          { name: 'Two-word phrase', date: 'Mar 2025', done: false },
+          { name: 'Name response >80%', date: 'Apr 2025', done: false }
+        ],
+        domains: [
+          { name: 'Social Communication', before: 48, now: 52, color: 'var(--amber)', change: '+4%' },
+          { name: 'Eye Contact', before: 52, now: 52, color: 'var(--amber)', change: '0%' },
+          { name: 'Gesture Use', before: 43, now: 45, color: 'var(--amber)', change: '+2%' },
+          { name: 'Language', before: 48, now: 55, color: 'var(--amber)', change: '+7%' },
+          { name: 'Repetitive Motion', before: 47, now: 44, color: 'var(--a)', change: '-3%' }
+        ],
+        goals: [
+          { name: 'Consistent name response', prog: 70, done: false },
+          { name: 'Declarative pointing', prog: 45, done: false },
+          { name: '2-way conversational turns', prog: 55, done: false },
+          { name: 'Social play with peer', prog: 30, done: false },
+          { name: 'Regular eye contact', prog: 100, done: true }
+        ],
+        insights: [
+          { icon: '📊', title: 'Stable Medium Risk Profile', text: 'Risk score has been stable between 49–55% for 5 months. Profile suggests monitoring with periodic targeted intervention.' },
+          { icon: '🌱', title: 'Language Showing Best Progress', text: 'Language domain improved 7% this period — the strongest growth area. Encourage reading and singing routines daily.' },
+          { icon: '🎯', title: 'Social Interaction Focus Area', text: 'Social communication remains in medium range. Group play therapy sessions could help develop peer interaction skills.' }
+        ]
+      },
+      leo: {
+        name: 'Leo M.', risk: 'low-on-track',
+        sessions: [
+          { date: 'Nov 2024', score: 22, eye: 85, gest: 80, rep: 10, label: 'sb-l', badge: 'Low Risk', color: 'var(--a)' },
+          { date: 'Feb 2025', score: 19, eye: 88, gest: 85, rep: 8, label: 'sb-l', badge: 'Low Risk', color: 'var(--a)' }
+        ],
+        milestones: [
+          { name: 'Excellent joint attention', date: 'Nov 2024', done: true },
+          { name: 'Rich pretend play', date: 'Nov 2024', done: true },
+          { name: 'Age-appropriate language', date: 'Feb 2025', done: true },
+          { name: 'Social referencing active', date: 'Feb 2025', done: true },
+          { name: 'Next check-up', date: 'Aug 2025', done: false }
+        ],
+        domains: [
+          { name: 'Social Communication', before: 84, now: 88, color: 'var(--a)', change: '+4%' },
+          { name: 'Eye Contact', before: 85, now: 88, color: 'var(--a)', change: '+3%' },
+          { name: 'Gesture Use', before: 80, now: 85, color: 'var(--a)', change: '+5%' },
+          { name: 'Language', before: 82, now: 86, color: 'var(--a)', change: '+4%' },
+          { name: 'Repetitive Motion', before: 10, now: 8, color: 'var(--a)', change: '-2%' }
+        ],
+        goals: [
+          { name: 'Maintain low risk profile', prog: 100, done: true },
+          { name: 'Annual re-screening', prog: 100, done: true },
+          { name: 'Regular developmental check', prog: 60, done: false },
+          { name: 'Social play skill building', prog: 85, done: false }
+        ],
+        insights: [
+          { icon: '🌟', title: 'Consistently Low Risk', text: 'Leo\'s profile shows consistently strong developmental markers across all screened domains. Continue routine monitoring.' },
+          { icon: '📈', title: 'All Metrics Improving', text: 'Every domain shows marginal improvement between the two screenings. Typical healthy trajectory for this age.' },
+          { icon: '✅', title: 'Next Screening in 6 Months', text: 'Schedule next routine check for August 2025. No interventions recommended at this time.' }
+        ]
+      },
+      zara: {
+        name: 'Zara T.', risk: 'high-monitoring',
+        sessions: [
+          { date: 'Dec 2024', score: 68, eye: 25, gest: 20, rep: 80, label: 'sb-h', badge: 'High Risk', color: 'var(--rose)' },
+          { date: 'Feb 2025', score: 71, eye: 22, gest: 18, rep: 82, label: 'sb-h', badge: 'High Risk', color: 'var(--rose)' }
+        ],
+        milestones: [
+          { name: 'First smile response', date: 'Dec 2024', done: true },
+          { name: 'Brief eye contact (0.5s)', date: 'Feb 2025', done: true },
+          { name: 'Name response goal', date: 'Apr 2025', done: false },
+          { name: 'First gesture', date: 'May 2025', done: false }
+        ],
+        domains: [
+          { name: 'Social Communication', before: 24, now: 22, color: 'var(--rose)', change: '-2%' },
+          { name: 'Eye Contact', before: 25, now: 22, color: 'var(--rose)', change: '-3%' },
+          { name: 'Gesture Use', before: 20, now: 18, color: 'var(--rose)', change: '-2%' },
+          { name: 'Language', before: 18, now: 20, color: 'var(--rose)', change: '+2%' },
+          { name: 'Repetitive Motion', before: 80, now: 82, color: 'var(--rose)', change: '+2%' }
+        ],
+        goals: [
+          { name: 'Daily ABA therapy sessions', prog: 100, done: true },
+          { name: 'Eye contact during feeding', prog: 25, done: false },
+          { name: 'Name response training', prog: 20, done: false },
+          { name: 'Sensory integration therapy', prog: 60, done: false }
+        ],
+        insights: [
+          { icon: '⚠️', title: 'Score Slightly Increased', text: 'Risk score rose from 68% to 71% between screenings. Intensified early intervention is urgently recommended.' },
+          { icon: '🎯', title: 'ABA Therapy Initiated', text: 'Applied Behavior Analysis sessions started. Expected to show measurable impact in 3–6 months.' },
+          { icon: '🏥', title: 'Developmental Eval Recommended', text: 'Full clinical diagnostic evaluation by developmental pediatrician is strongly recommended within 30 days.' }
+        ]
+      }
+    };
+
+    let currentChild = 'aiden';
+    let chartInstance = null;
+
+    function selectChild(key, btn) {
+      document.querySelectorAll('.child-chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      currentChild = key;
+      renderAll();
+    }
+
+    function renderAll() {
+      const d = CHILD_DATA[currentChild];
+      document.getElementById('chartTitle').textContent = `${d.name} — Risk Score Over Time`;
+      drawChart(d.sessions, '3m');
+      renderMilestones(d.milestones);
+      renderDomains(d.domains);
+      renderSessions(d.sessions);
+      renderGoals(d.goals);
+      renderInsights(d.insights);
+    }
+
+    function drawChart(sessions, range) {
+      const canvas = document.getElementById('progressChart');
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.offsetWidth * 2;
+      canvas.height = 400;
+      ctx.scale(2, 2);
+      const W = canvas.offsetWidth / 2;
+      const H = 200;
+      const pad = { top: 20, right: 20, bottom: 40, left: 40 };
+      const chartW = W - pad.left - pad.right;
+      const chartH = H - pad.top - pad.bottom;
+
+      let data = sessions;
+      if (range === '3m') data = sessions.slice(-3);
+      else if (range === '6m') data = sessions.slice(-6);
+
+      ctx.clearRect(0, 0, W, H);
+
+      // BG
+      ctx.fillStyle = '#0a1628';
+      ctx.fillRect(0, 0, W, H);
+
+      // Risk zone
+      ctx.fillStyle = 'rgba(185,28,28,0.04)';
+      const highY = pad.top + chartH - (60 / 100) * chartH;
+      ctx.fillRect(pad.left, highY, chartW, (60 / 100) * chartH);
+      ctx.strokeStyle = 'rgba(185,28,28,0.15)';
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(pad.left, highY);
+      ctx.lineTo(pad.left + chartW, highY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = 'rgba(185,28,28,0.4)';
+      ctx.font = '9px DM Sans';
+      ctx.fillText('HIGH RISK', pad.left + 4, highY - 4);
+
+      // Grid
+      [0, 25, 50, 75, 100].forEach(v => {
+        const y = pad.top + chartH - (v / 100) * chartH;
+        ctx.strokeStyle = 'rgba(255,255,255,0.06)';;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + chartW, y); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = 'rgba(255,255,255,0.35)';
+        ctx.font = '9px DM Sans';
+        ctx.fillText(v + '%', 0, y + 3);
+      });
+
+      // Axes
+      ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, pad.top); ctx.lineTo(pad.left, pad.top + chartH);
+      ctx.moveTo(pad.left, pad.top + chartH); ctx.lineTo(pad.left + chartW, pad.top + chartH);
+      ctx.stroke();
+
+      const drawLine = (key, color, width = 2) => {
+        if (data.length < 2) return;
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.lineJoin = 'round';
+        data.forEach((s, i) => {
+          const x = pad.left + (i / (data.length - 1)) * chartW;
+          const y = pad.top + chartH - (s[key] / 100) * chartH;
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+
+        // Points
+        data.forEach((s, i) => {
+          const x = pad.left + (i / (data.length - 1)) * chartW;
+          const y = pad.top + chartH - (s[key] / 100) * chartH;
+          ctx.beginPath();
+          ctx.arc(x, y, width === 3 ? 5 : 3.5, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.fill();
+          ctx.fillStyle = '#0a1628';
+          ctx.beginPath();
+          ctx.arc(x, y, width === 3 ? 2.5 : 1.5, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      };
+
+      // Area under risk line
+      if (data.length > 1) {
+        ctx.beginPath();
+        data.forEach((s, i) => {
+          const x = pad.left + (i / (data.length - 1)) * chartW;
+          const y = pad.top + chartH - (s.score / 100) * chartH;
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        });
+        ctx.lineTo(pad.left + chartW, pad.top + chartH);
+        ctx.lineTo(pad.left, pad.top + chartH);
+        ctx.closePath();
+        const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + chartH);
+        grad.addColorStop(0, 'rgba(225,29,72,0.12)');
+        grad.addColorStop(1, 'rgba(225,29,72,0.01)');
+        ctx.fillStyle = grad;
+        ctx.fill();
+      }
+
+      drawLine('score', '#e11d48', 3);
+      drawLine('eye', '#166534', 1.5);
+      drawLine('gest', '#d97706', 1.5);
+
+      // X labels
+      ctx.fillStyle = '#9ca3af';
+      ctx.font = '9px DM Sans';
+      ctx.textAlign = 'center';
+      data.forEach((s, i) => {
+        const x = pad.left + (i / (Math.max(data.length - 1, 1))) * chartW;
+        ctx.fillText(s.date, x, pad.top + chartH + 14);
+        // Score label
+        const y = pad.top + chartH - (s.score / 100) * chartH;
+        ctx.fillStyle = '#e11d48';
+        ctx.font = 'bold 9px DM Sans';
+        ctx.fillText(s.score + '%', x, y - 8);
+        ctx.fillStyle = '#9ca3af';
+        ctx.font = '9px DM Sans';
+      });
+    }
+
+    function setRange(range, btn) {
+      document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const d = CHILD_DATA[currentChild];
+      drawChart(d.sessions, range);
+    }
+
+    function renderMilestones(milestones) {
+      document.getElementById('milestoneList').innerHTML = milestones.map((m, i) => `
+    <div class="milestone">
+      <div class="m-icon ${m.done ? 'm-achieved' : 'm-pending'}">${m.done ? '✓' : '○'}</div>
+      <div class="m-info">
+        <div class="m-name" style="color:${m.done ? 'var(--t)' : 'var(--ts)'}">${m.name}</div>
+        <div class="m-date">${m.done ? '✅ ' : '🎯 Target: '}${m.date}</div>
+      </div>
+    </div>
+    ${i < milestones.length - 1 ? '<div class="m-connector"></div>' : ''}
+  `).join('');
+    }
+
+    function renderDomains(domains) {
+      document.getElementById('domainRows').innerHTML = domains.map(d => {
+        const isImproving = d.name === 'Repetitive Motion' ? d.before > d.now : d.now > d.before;
+        const changeCls = isImproving ? 'change-pos' : 'change-neg';
+        return `<div class="domain-row">
+      <div class="dr-header"><span class="dr-name">${d.name}</span><span class="dr-change ${changeCls}">${d.change}</span></div>
+      <div class="dr-bar">
+        <div class="dr-fill-before" style="width:${d.before}%;background:${d.color}"></div>
+        <div class="dr-fill-now" style="width:${d.now}%;background:${d.color}"></div>
+      </div>
+    </div>`;
+      }).join('');
+    }
+
+    function renderSessions(sessions) {
+      document.getElementById('sessionRows').innerHTML = sessions.map((s, i) =>
+        `<div class="session-card${i === sessions.length - 1 ? ' active' : ''}">
+      <div class="sess-top"><div class="sess-date">${s.date}</div><span class="sess-badge ${s.label}">${s.badge}</span></div>
+      <div class="sess-score" style="color:${s.color}">${s.score}%</div>
+      <div class="sess-mini-bars">
+        <div class="smb"><span class="smb-label">Eye Contact</span><div class="smb-bar"><div class="smb-fill" style="width:${s.eye}%;background:var(--a2)"></div></div><span class="smb-val">${s.eye}%</span></div>
+        <div class="smb"><span class="smb-label">Gesture Use</span><div class="smb-bar"><div class="smb-fill" style="width:${s.gest}%;background:var(--amber)"></div></div><span class="smb-val">${s.gest}%</span></div>
+        <div class="smb"><span class="smb-label">Repetitive</span><div class="smb-bar"><div class="smb-fill" style="width:${s.rep}%;background:var(--rose)"></div></div><span class="smb-val">${s.rep}%</span></div>
+      </div>
+    </div>`
+      ).join('');
+    }
+
+    function renderGoals(goals) {
+      document.getElementById('goalList').innerHTML = goals.map((g, i) =>
+        `<div class="goal-item">
+      <div class="goal-check${g.done ? ' done' : ''}" onclick="toggleGoal(${i})" id="gc-${i}">${g.done ? '✓' : ''}</div>
+      <div class="goal-text">
+        <div class="goal-name" style="color:${g.done ? 'var(--ts)' : 'var(--t)'}${g.done ? ';text-decoration:line-through' : ''}">${g.name}</div>
+        <div class="goal-prog">${g.prog}% complete</div>
+        <div class="goal-bar"><div class="goal-fill" style="width:${g.prog}%;background:${g.done ? 'var(--a)' : 'var(--a2)'}"></div></div>
+      </div>
+    </div>`
+      ).join('');
+    }
+
+    function toggleGoal(i) {
+      const d = CHILD_DATA[currentChild];
+      d.goals[i].done = !d.goals[i].done;
+      d.goals[i].prog = d.goals[i].done ? 100 : d.goals[i].prog;
+      renderGoals(d.goals);
+    }
+
+    function renderInsights(insights) {
+      document.getElementById('insightList').innerHTML = insights.map(ins =>
+        `<div class="insight-item">
+      <div class="ii-icon">${ins.icon}</div>
+      <div class="ii-title">${ins.title}</div>
+      <div class="ii-text">${ins.text}</div>
+    </div>`
+      ).join('');
+    }
+
+    renderAll();
+    window.addEventListener('resize', () => drawChart(CHILD_DATA[currentChild].sessions, '3m'));
+  </script>
+  <footer class="nc-footer" style="padding:24px 32px; margin-top: 40px;">
+    <div class="footer-brand">🧠 NeuroCare AI</div>
+    <div class="footer-links"><a href="index.html">Home</a><a href="privacy.html">Privacy</a><a
+        href="terms.html">Terms</a><a href="contact.html">Contact</a></div>
+    <div class="footer-copy">© 2026 NeuroCare AI. For screening purposes only.</div>
+  </footer>
+  <script src="js/auth.js"></script>
+  <script src="js/navigation.js"></script>
+  <script>
+    if (!NeuroCareAuth.isAuthenticated()) {
+      window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+    }
+  </script>
+</body>
+
+</html>
